@@ -43,8 +43,8 @@ export function BetSlip({ bets, onRemoveBet, onPlaceBet, onClear }: BetSlipProps
               <div key={bet.id} className="bg-white/5 rounded-lg p-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-medium text-white text-sm">{bet.selection}</p>
-                    <p className="text-xs text-gray-400">{bet.match}</p>
+                    <p className="font-medium text-white text-sm">{bet.betType}</p>
+                    <p className="text-xs text-gray-400">{bet.match.homeTeam.name} vs {bet.match.awayTeam.name}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-primary">{bet.odds.toFixed(2)}</span>

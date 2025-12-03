@@ -2,10 +2,10 @@
 
 import { Clock, ExternalLink } from 'lucide-react';
 import { GlassCard, Badge } from '@/components/ui';
-import type { News } from '@/types/stocks';
+import type { StockNews } from '@/types/stocks';
 
 interface NewsCardProps {
-  news: News;
+  news: StockNews;
   onClick?: () => void;
 }
 
@@ -19,11 +19,6 @@ export function NewsCard({ news, onClick }: NewsCardProps) {
   return (
     <GlassCard className="cursor-pointer hover:border-primary/50 transition-colors" onClick={onClick}>
       <div className="flex items-start gap-4">
-        {news.image && (
-          <div className="w-24 h-24 rounded-lg bg-white/10 overflow-hidden flex-shrink-0">
-            <img src={news.image} alt="" className="w-full h-full object-cover" />
-          </div>
-        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2">
             <Badge variant={sentimentColors[news.sentiment]}>{news.sentiment}</Badge>

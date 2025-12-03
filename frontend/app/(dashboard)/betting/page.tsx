@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Trophy, Zap, Calendar, Clock, Filter } from 'lucide-react';
 import { GlassCard, GlassButton, Badge, Tabs } from '@/components/ui';
 import { MatchCard, ValueBetCard, BetSlip, KellyCalculator, PoissonCalculator } from '@/components/betting';
-import { matches } from '@/lib/mock-data';
+import { matches, mockValueBets } from '@/lib/mock-data';
 import type { Bet } from '@/types/betting';
 
 export default function BettingPage() {
@@ -96,9 +96,9 @@ export default function BettingPage() {
           {selectedTab === 'value-bets' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid gap-4">
-                {/* {mockValueBets.map((valueBet) => (
-                  <ValueBetCard key={valueBet.id} valueBet={valueBet} />
-                ))} */}
+                {mockValueBets.map((valueBet) => (
+                  <ValueBetCard key={valueBet.matchId} valueBet={valueBet} />
+                ))}
               </div>
             </motion.div>
           )}

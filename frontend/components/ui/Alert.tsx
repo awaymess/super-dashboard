@@ -3,9 +3,11 @@ import { cn } from '@/lib/cn';
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
 interface AlertProps {
-  type: 'success' | 'error' | 'warning' | 'info';
+  type?: 'success' | 'error' | 'warning' | 'info';
+  variant?: 'success' | 'error' | 'warning' | 'info';
   title?: string;
-  message: string;
+  message?: string;
+  children?: React.ReactNode;
   onDismiss?: () => void;
   className?: string;
 }
@@ -31,23 +33,26 @@ const iconColors = {
   info: 'text-primary',
 };
 
-export function Alert({ type, title, message, onDismiss, className }: AlertProps) {
-  const Icon = icons[type];
+export function Alert({ type, variant, title, message, children, onDismiss, className }: AlertProps) {
+  // Support both 'type' and 'variant' props for backwards compatibility
+  const alertType = type || variant || 'info';
+  const Icon = icons[alertType];
 
   return (
     <div
       className={cn(
         'flex items-start gap-3 p-4 rounded-xl border',
-        colors[type],
+        colors[alertType],
         className
       )}
     >
-      <Icon className={cn('w-5 h-5 mt-0.5 shrink-0', iconColors[type])} />
+      <Icon className={cn('w-5 h-5 mt-0.5 shrink-0', iconColors[alertType])} />
       <div className="flex-1 min-w-0">
         {title && (
           <h4 className="text-sm font-semibold text-white mb-1">{title}</h4>
         )}
-        <p className="text-sm text-white/80">{message}</p>
+        {message && <p className="text-sm text-white/80">{message}</p>}
+        {children && <p className="text-sm text-white/80">{children}</p>}
       </div>
       {onDismiss && (
         <button

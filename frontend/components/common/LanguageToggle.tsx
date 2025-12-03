@@ -25,6 +25,7 @@ export function LanguageToggle({ currentLocale, onLocaleChange }: LanguageToggle
         </GlassButton>
       }
       items={languages.map(lang => ({
+        id: lang.code,
         label: `${lang.flag} ${lang.label}`,
         onClick: () => onLocaleChange(lang.code),
       }))}

@@ -1,4 +1,4 @@
-import { Match, Team, H2HRecord } from '@/types/betting';
+import { Match, Team, H2HRecord, ValueBet } from '@/types/betting';
 
 const teams: Record<string, Team> = {
   'manu': { id: 'manu', name: 'Manchester United', shortName: 'MUN', form: ['W', 'D', 'W', 'L', 'W'], goalsScoredAvg: 1.8, goalsConcededAvg: 1.2, cleanSheetPct: 35 },
@@ -103,6 +103,98 @@ export const matches: Match[] = [
   { id: '48', homeTeam: teams.brighton, awayTeam: teams.tottenham, league: 'Premier League', leagueCountry: 'England', date: '2025-01-22', time: '20:00', status: 'scheduled', odds: { home: 2.60, draw: 3.30, away: 2.70, over25: 1.80, under25: 2.00, btts: 1.75, bttsNo: 2.10, homeDouble: 1.50, awayDouble: 1.52 }, h2h: generateH2H(teams.brighton, teams.tottenham) },
   { id: '49', homeTeam: teams.crystalpalace, awayTeam: teams.arsenal, league: 'Premier League', leagueCountry: 'England', date: '2025-01-23', time: '20:00', status: 'scheduled', odds: { home: 4.00, draw: 3.50, away: 1.90, over25: 1.85, under25: 1.95, btts: 1.80, bttsNo: 2.00, homeDouble: 1.88, awayDouble: 1.32 }, h2h: generateH2H(teams.crystalpalace, teams.arsenal) },
   { id: '50', homeTeam: teams.westham, awayTeam: teams.liverpool, league: 'Premier League', leagueCountry: 'England', date: '2025-01-24', time: '20:00', status: 'scheduled', odds: { home: 4.50, draw: 3.80, away: 1.75, over25: 1.70, under25: 2.15, btts: 1.75, bttsNo: 2.10, homeDouble: 2.08, awayDouble: 1.28 }, h2h: generateH2H(teams.westham, teams.liverpool) },
+];
+
+// Generate value bets from matches with positive expected value
+export const valueBets: ValueBet[] = [
+  {
+    matchId: '1',
+    match: matches[0],
+    betType: 'Over 2.5 Goals',
+    bookmakerOdds: 1.75,
+    fairOdds: 1.60,
+    value: 9.4,
+    confidence: 72,
+    kellyStake: 4.2,
+    expectedValue: 8.5,
+  },
+  {
+    matchId: '2',
+    match: matches[1],
+    betType: 'Home Win',
+    bookmakerOdds: 1.55,
+    fairOdds: 1.42,
+    value: 9.2,
+    confidence: 78,
+    kellyStake: 5.1,
+    expectedValue: 9.0,
+  },
+  {
+    matchId: '3',
+    match: matches[2],
+    betType: 'BTTS Yes',
+    bookmakerOdds: 1.85,
+    fairOdds: 1.70,
+    value: 8.8,
+    confidence: 65,
+    kellyStake: 3.5,
+    expectedValue: 7.2,
+  },
+  {
+    matchId: '11',
+    match: matches[10],
+    betType: 'Over 2.5 Goals',
+    bookmakerOdds: 1.55,
+    fairOdds: 1.40,
+    value: 10.7,
+    confidence: 82,
+    kellyStake: 6.0,
+    expectedValue: 11.2,
+  },
+  {
+    matchId: '13',
+    match: matches[12],
+    betType: 'Home Win',
+    bookmakerOdds: 1.55,
+    fairOdds: 1.45,
+    value: 6.9,
+    confidence: 68,
+    kellyStake: 3.2,
+    expectedValue: 5.8,
+  },
+  {
+    matchId: '17',
+    match: matches[16],
+    betType: 'Under 2.5 Goals',
+    bookmakerOdds: 2.15,
+    fairOdds: 1.95,
+    value: 10.3,
+    confidence: 61,
+    kellyStake: 3.8,
+    expectedValue: 8.5,
+  },
+  {
+    matchId: '19',
+    match: matches[18],
+    betType: 'BTTS Yes',
+    bookmakerOdds: 1.65,
+    fairOdds: 1.52,
+    value: 8.6,
+    confidence: 70,
+    kellyStake: 4.0,
+    expectedValue: 7.8,
+  },
+  {
+    matchId: '34',
+    match: matches[33],
+    betType: 'Over 2.5 Goals',
+    bookmakerOdds: 1.55,
+    fairOdds: 1.42,
+    value: 9.2,
+    confidence: 75,
+    kellyStake: 4.5,
+    expectedValue: 8.9,
+  },
 ];
 
 export default matches;

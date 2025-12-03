@@ -8,13 +8,15 @@ export function KellyCalculator() {
   const [probability, setProbability] = useState('55');
   const [odds, setOdds] = useState('2.00');
 
-  const prob = parseFloat(probability) / 100 || 0;
+  const probPercent = parseFloat(probability) || 0;  // Probability as percentage (0-100)
+  const prob = probPercent / 100;  // Probability as decimal (0-1)
   const oddsNum = parseFloat(odds) || 0;
 
   const fullKelly = calculateFullKelly(prob, oddsNum);
   const halfKelly = calculateHalfKelly(prob, oddsNum);
   const quarterKelly = calculateQuarterKelly(prob, oddsNum);
-  const edge = calculateKelly(prob, oddsNum).edge;
+  const kellyResult = calculateKelly(probPercent, oddsNum);  // Pass percentage to calculateKelly
+  const edge = kellyResult.edge;
 
   return (
     <GlassCard>
@@ -47,10 +49,10 @@ export function KellyCalculator() {
         <div className="flex justify-between text-sm mb-2">
           <span className="text-gray-400">Edge</span>
           <span className={edge > 0 ? 'text-success' : 'text-danger'}>
-            {edge > 0 ? '+' : ''}{(edge * 100).toFixed(2)}%
+            {edge > 0 ? '+' : ''}{edge.toFixed(2)}%
           </span>
         </div>
-        <Progress value={Math.max(0, edge * 100)} max={50} color={edge > 0 ? 'success' : 'danger'} />
+        <Progress value={Math.max(0, edge)} max={50} variant={edge > 0 ? 'success' : 'danger'} />
       </div>
 
       <div className="space-y-4">

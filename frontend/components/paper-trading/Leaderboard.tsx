@@ -2,15 +2,7 @@
 
 import { Trophy, TrendingUp, Medal } from 'lucide-react';
 import { GlassCard, Avatar, Badge } from '@/components/ui';
-
-interface LeaderboardEntry {
-  rank: number;
-  username: string;
-  avatar?: string;
-  totalReturn: number;
-  winRate: number;
-  trades: number;
-}
+import type { LeaderboardEntry } from '@/types/paper-trading';
 
 interface LeaderboardProps {
   entries: LeaderboardEntry[];
@@ -63,12 +55,12 @@ export function Leaderboard({ entries, currentUser }: LeaderboardProps) {
                 <p className={`font-medium truncate ${isCurrentUser ? 'text-primary' : 'text-white'}`}>
                   {entry.username}
                 </p>
-                <p className="text-xs text-gray-400">{entry.trades} trades</p>
+                <p className="text-xs text-gray-400">{entry.totalTrades} trades</p>
               </div>
               
               <div className="text-right">
                 <p className={`font-bold ${isPositive ? 'text-success' : 'text-danger'}`}>
-                  {isPositive ? '+' : ''}{entry.totalReturn.toFixed(2)}%
+                  {isPositive ? '+' : ''}{entry.totalReturnPercent.toFixed(2)}%
                 </p>
                 <p className="text-xs text-gray-400">{entry.winRate.toFixed(0)}% win rate</p>
               </div>

@@ -10,8 +10,9 @@ interface PositionCardProps {
 }
 
 export function PositionCard({ position, onClose }: PositionCardProps) {
-  const isPositive = position.pnl >= 0;
-  const pnlPercent = (position.pnl / (position.entryPrice * position.quantity)) * 100;
+  const pnl = position.unrealizedPL;
+  const isPositive = pnl >= 0;
+  const pnlPercent = position.unrealizedPLPercent;
 
   return (
     <GlassCard>
@@ -19,8 +20,8 @@ export function PositionCard({ position, onClose }: PositionCardProps) {
         <div>
           <div className="flex items-center gap-2">
             <h4 className="font-bold text-white">{position.symbol}</h4>
-            <Badge variant={position.side === 'long' ? 'success' : 'danger'}>
-              {position.side.toUpperCase()}
+            <Badge variant={pnl >= 0 ? 'success' : 'danger'}>
+              {position.name}
             </Badge>
           </div>
           <p className="text-sm text-gray-400">{position.quantity} shares</p>
@@ -32,8 +33,8 @@ export function PositionCard({ position, onClose }: PositionCardProps) {
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-xs text-gray-400 mb-1">Entry Price</p>
-          <p className="font-semibold text-white">${position.entryPrice.toFixed(2)}</p>
+          <p className="text-xs text-gray-400 mb-1">Avg Cost</p>
+          <p className="font-semibold text-white">${position.avgCost.toFixed(2)}</p>
         </div>
         <div>
           <p className="text-xs text-gray-400 mb-1">Current Price</p>
@@ -53,7 +54,7 @@ export function PositionCard({ position, onClose }: PositionCardProps) {
           </div>
           <div className="text-right">
             <p className={`font-bold ${isPositive ? 'text-success' : 'text-danger'}`}>
-              {isPositive ? '+' : ''}${position.pnl.toFixed(2)}
+              {isPositive ? '+' : ''}${pnl.toFixed(2)}
             </p>
             <p className={`text-sm ${isPositive ? 'text-success' : 'text-danger'}`}>
               {isPositive ? '+' : ''}{pnlPercent.toFixed(2)}%
