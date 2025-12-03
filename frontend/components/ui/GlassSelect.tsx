@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useId } from 'react';
 import { cn } from '@/lib/cn';
 import { SelectOption } from '@/types/common';
 
@@ -26,7 +26,8 @@ export const GlassSelect = forwardRef<HTMLSelectElement, GlassSelectProps>(
     },
     ref
   ) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const generatedId = useId();
+    const selectId = id || generatedId;
 
     return (
       <div className="w-full">

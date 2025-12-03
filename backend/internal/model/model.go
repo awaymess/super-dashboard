@@ -8,7 +8,7 @@ import (
 
 // BaseModel contains common model fields
 type BaseModel struct {
-	ID        uuid.UUID `gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
