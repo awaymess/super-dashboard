@@ -1,4 +1,4 @@
-import { Portfolio, Position, Transaction, JournalEntry, LeaderboardEntry } from '@/types/paper-trading';
+import { Portfolio, Position, Transaction, JournalEntry, LeaderboardEntry, Trade } from '@/types/paper-trading';
 
 export const portfolio: Portfolio = {
   id: 'main-portfolio',
@@ -267,6 +267,23 @@ export const leaderboard: LeaderboardEntry[] = [
   { rank: 13, username: 'QuantKid', avatar: undefined, totalReturn: 21098.76, totalReturnPercent: 21.10, winRate: 56.8, totalTrades: 512, sharpeRatio: 1.22 },
   { rank: 14, username: 'IndexHugger', avatar: undefined, totalReturn: 18765.43, totalReturnPercent: 18.77, winRate: 61.5, totalTrades: 34, sharpeRatio: 1.15 },
   { rank: 15, username: 'NewbieTrader', avatar: undefined, totalReturn: 15432.10, totalReturnPercent: 15.43, winRate: 48.9, totalTrades: 78, sharpeRatio: 0.98 },
+];
+
+// Positions extracted from portfolio for easy access
+export const positions: Position[] = portfolio.positions;
+
+// Mock trades data for trade journal
+export const trades: Trade[] = [
+  { id: 'trade-1', symbol: 'AAPL', side: 'buy', orderType: 'market', quantity: 50, price: 175.50, pnl: 722.50, notes: 'Initial position on pullback', timestamp: '2024-09-15T10:30:00Z' },
+  { id: 'trade-2', symbol: 'MSFT', side: 'buy', orderType: 'limit', quantity: 30, price: 355.00, pnl: 587.40, notes: 'Adding tech exposure', timestamp: '2024-08-20T14:15:00Z' },
+  { id: 'trade-3', symbol: 'NVDA', side: 'buy', orderType: 'market', quantity: 25, price: 420.00, pnl: 1402.25, notes: 'AI play', timestamp: '2024-07-10T09:45:00Z' },
+  { id: 'trade-4', symbol: 'GOOGL', side: 'buy', orderType: 'limit', quantity: 80, price: 128.50, pnl: 895.20, notes: 'Good entry point', timestamp: '2024-10-05T11:00:00Z' },
+  { id: 'trade-5', symbol: 'AMZN', side: 'buy', orderType: 'market', quantity: 60, price: 142.00, pnl: 596.40, notes: 'E-commerce recovery', timestamp: '2024-09-25T15:30:00Z' },
+  { id: 'trade-6', symbol: 'META', side: 'buy', orderType: 'limit', quantity: 20, price: 320.00, pnl: 446.60, notes: 'Metaverse bet', timestamp: '2024-11-01T10:00:00Z' },
+  { id: 'trade-7', symbol: 'TSLA', side: 'buy', orderType: 'market', quantity: 45, price: 252.00, pnl: -609.75, notes: 'EV leader position', timestamp: '2024-06-15T11:30:00Z' },
+  { id: 'trade-8', symbol: 'AMD', side: 'sell', orderType: 'limit', quantity: 100, price: 142.50, pnl: 2350.00, notes: 'Taking profits', timestamp: '2024-11-10T10:00:00Z' },
+  { id: 'trade-9', symbol: 'CRM', side: 'sell', orderType: 'market', quantity: 30, price: 262.00, pnl: 1860.00, notes: 'Rebalancing', timestamp: '2024-11-05T14:30:00Z' },
+  { id: 'trade-10', symbol: 'JPM', side: 'buy', orderType: 'limit', quantity: 40, price: 158.00, pnl: 566.00, notes: 'Banking sector exposure', timestamp: '2024-10-15T13:00:00Z' },
 ];
 
 export default portfolio;

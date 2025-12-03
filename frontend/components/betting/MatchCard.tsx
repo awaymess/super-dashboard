@@ -12,16 +12,20 @@ interface MatchCardProps {
 
 export function MatchCard({ match, onClick }: MatchCardProps) {
   const statusColors = {
+    scheduled: 'warning',
     upcoming: 'warning',
     live: 'danger',
     finished: 'default',
+    postponed: 'secondary',
   } as const;
+
+  const status = match.status as keyof typeof statusColors;
 
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <GlassCard className="cursor-pointer" onClick={onClick}>
         <div className="flex items-center justify-between mb-4">
-          <Badge variant={statusColors[match.status]}>{match.status.toUpperCase()}</Badge>
+          <Badge variant={statusColors[status]}>{match.status.toUpperCase()}</Badge>
           <span className="text-xs text-gray-400">{match.league}</span>
         </div>
 
@@ -35,16 +39,16 @@ export function MatchCard({ match, onClick }: MatchCardProps) {
           </div>
 
           <div className="px-4 text-center">
-            {match.status === 'finished' ? (
+            {match.status === 'finished' && match.homeScore !== undefined && match.awayScore !== undefined ? (
               <p className="text-2xl font-bold text-white">
-                {match.homeTeam.score} - {match.awayTeam.score}
+                {match.homeScore} - {match.awayScore}
               </p>
             ) : (
               <p className="text-lg font-medium text-gray-400">VS</p>
             )}
             <div className="flex items-center gap-1 text-xs text-gray-400 mt-2">
               <Clock className="w-3 h-3" />
-              {match.startTime}
+              {match.time}
             </div>
           </div>
 

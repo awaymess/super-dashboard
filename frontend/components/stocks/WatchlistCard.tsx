@@ -2,7 +2,6 @@
 
 import { Star, TrendingUp, TrendingDown, MoreVertical } from 'lucide-react';
 import { GlassCard, Badge, Dropdown } from '@/components/ui';
-import { SparkLine } from '@/components/charts';
 import type { Stock } from '@/types/stocks';
 
 interface WatchlistCardProps {
@@ -39,11 +38,6 @@ export function WatchlistCard({ stocks, onRemove, onView }: WatchlistCardProps) 
               </div>
               
               <div className="flex items-center gap-4">
-                <SparkLine 
-                  data={stock.priceHistory || []} 
-                  height={24} 
-                  width={60} 
-                />
                 <div className="text-right min-w-[100px]">
                   <p className="font-semibold text-white">${stock.price.toFixed(2)}</p>
                   <p className={`text-xs flex items-center justify-end gap-1 ${isPositive ? 'text-success' : 'text-danger'}`}>

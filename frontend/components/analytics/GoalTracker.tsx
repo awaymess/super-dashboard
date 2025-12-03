@@ -47,7 +47,7 @@ export function GoalTracker({ goals }: GoalTrackerProps) {
                 <Progress 
                   value={goal.current} 
                   max={goal.target} 
-                  color={isCompleted ? 'success' : 'primary'} 
+                  variant={isCompleted ? 'success' : 'default'} 
                 />
               </div>
               

@@ -39,20 +39,20 @@ export function StockQuote({ stock, showDetails = true }: StockQuoteProps) {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white/5 p-4 rounded-lg">
-              <p className="text-sm text-gray-400 mb-1">Open</p>
-              <p className="text-lg font-semibold text-white">${stock.open?.toFixed(2)}</p>
+              <p className="text-sm text-gray-400 mb-1">52W High</p>
+              <p className="text-lg font-semibold text-success">${stock.high52Week?.toFixed(2)}</p>
             </div>
             <div className="bg-white/5 p-4 rounded-lg">
-              <p className="text-sm text-gray-400 mb-1">High</p>
-              <p className="text-lg font-semibold text-success">${stock.high?.toFixed(2)}</p>
+              <p className="text-sm text-gray-400 mb-1">52W Low</p>
+              <p className="text-lg font-semibold text-danger">${stock.low52Week?.toFixed(2)}</p>
             </div>
             <div className="bg-white/5 p-4 rounded-lg">
-              <p className="text-sm text-gray-400 mb-1">Low</p>
-              <p className="text-lg font-semibold text-danger">${stock.low?.toFixed(2)}</p>
+              <p className="text-sm text-gray-400 mb-1">EPS</p>
+              <p className="text-lg font-semibold text-white">${stock.eps?.toFixed(2)}</p>
             </div>
             <div className="bg-white/5 p-4 rounded-lg">
-              <p className="text-sm text-gray-400 mb-1">Prev Close</p>
-              <p className="text-lg font-semibold text-white">${stock.previousClose?.toFixed(2)}</p>
+              <p className="text-sm text-gray-400 mb-1">Dividend</p>
+              <p className="text-lg font-semibold text-white">{stock.dividendYield?.toFixed(2)}%</p>
             </div>
           </div>
 
@@ -81,7 +81,7 @@ export function StockQuote({ stock, showDetails = true }: StockQuoteProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-400">P/E Ratio</p>
-                <p className="font-semibold text-white">{stock.peRatio?.toFixed(2) || 'N/A'}</p>
+                <p className="font-semibold text-white">{stock.pe?.toFixed(2) || 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -89,10 +89,8 @@ export function StockQuote({ stock, showDetails = true }: StockQuoteProps) {
                 <TrendingUp className="w-5 h-5 text-warning" />
               </div>
               <div>
-                <p className="text-sm text-gray-400">52W Range</p>
-                <p className="font-semibold text-white">
-                  ${stock.week52Low?.toFixed(0)} - ${stock.week52High?.toFixed(0)}
-                </p>
+                <p className="text-sm text-gray-400">Beta</p>
+                <p className="font-semibold text-white">{stock.beta?.toFixed(2)}</p>
               </div>
             </div>
           </div>

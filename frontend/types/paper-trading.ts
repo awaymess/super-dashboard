@@ -49,6 +49,18 @@ export interface TradeOrder {
   stopPrice?: number;
 }
 
+export interface Trade {
+  id: string;
+  symbol: string;
+  side: 'buy' | 'sell';
+  orderType: 'market' | 'limit' | 'stop' | 'stop_limit';
+  quantity: number;
+  price: number;
+  pnl?: number;
+  notes?: string;
+  timestamp: string;
+}
+
 export interface PerformanceMetrics {
   totalReturn: number;
   totalReturnPercent: number;

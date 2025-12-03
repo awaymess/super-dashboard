@@ -9,7 +9,9 @@ interface PortfolioSummaryProps {
 }
 
 export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
-  const isPositive = portfolio.totalPnL >= 0;
+  const totalPnL = portfolio.performance.totalReturn;
+  const totalPnLPercent = portfolio.performance.totalReturnPercent;
+  const isPositive = totalPnL >= 0;
 
   return (
     <GlassCard>
@@ -34,7 +36,7 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
             <span className="text-sm text-gray-400">Total P&L</span>
           </div>
           <p className={`text-2xl font-bold ${isPositive ? 'text-success' : 'text-danger'}`}>
-            {isPositive ? '+' : ''}${portfolio.totalPnL.toLocaleString()}
+            {isPositive ? '+' : ''}${totalPnL.toLocaleString()}
           </p>
         </div>
 
@@ -44,7 +46,7 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
             <span className="text-sm text-gray-400">P&L %</span>
           </div>
           <p className={`text-2xl font-bold ${isPositive ? 'text-success' : 'text-danger'}`}>
-            {isPositive ? '+' : ''}{portfolio.totalPnLPercent.toFixed(2)}%
+            {isPositive ? '+' : ''}{totalPnLPercent.toFixed(2)}%
           </p>
         </div>
 
@@ -53,22 +55,22 @@ export function PortfolioSummary({ portfolio }: PortfolioSummaryProps) {
             <DollarSign className="w-5 h-5 text-warning" />
             <span className="text-sm text-gray-400">Cash</span>
           </div>
-          <p className="text-2xl font-bold text-white">${portfolio.cash.toLocaleString()}</p>
+          <p className="text-2xl font-bold text-white">${portfolio.cashBalance.toLocaleString()}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
         <div className="text-center p-3 bg-success/10 rounded-lg">
           <p className="text-xs text-gray-400 mb-1">Win Rate</p>
-          <p className="text-xl font-bold text-success">{portfolio.winRate.toFixed(1)}%</p>
+          <p className="text-xl font-bold text-success">{portfolio.performance.winRate.toFixed(1)}%</p>
         </div>
         <div className="text-center p-3 bg-primary/10 rounded-lg">
           <p className="text-xs text-gray-400 mb-1">Total Trades</p>
-          <p className="text-xl font-bold text-primary">{portfolio.totalTrades}</p>
+          <p className="text-xl font-bold text-primary">{portfolio.transactions.length}</p>
         </div>
         <div className="text-center p-3 bg-secondary/10 rounded-lg">
           <p className="text-xs text-gray-400 mb-1">Open Positions</p>
-          <p className="text-xl font-bold text-secondary">{portfolio.openPositions}</p>
+          <p className="text-xl font-bold text-secondary">{portfolio.positions.length}</p>
         </div>
       </div>
     </GlassCard>

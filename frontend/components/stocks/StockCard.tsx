@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { GlassCard, Badge } from '@/components/ui';
-import { SparkLine } from '@/components/charts';
 import type { Stock } from '@/types/stocks';
 
 interface StockCardProps {
@@ -13,7 +12,6 @@ interface StockCardProps {
 
 export function StockCard({ stock, onClick }: StockCardProps) {
   const isPositive = stock.change >= 0;
-  const priceHistory = stock.priceHistory || [];
 
   return (
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -37,10 +35,6 @@ export function StockCard({ stock, onClick }: StockCardProps) {
               <span>({isPositive ? '+' : ''}{stock.changePercent.toFixed(2)}%)</span>
             </div>
           </div>
-
-          {priceHistory.length > 0 && (
-            <SparkLine data={priceHistory} height={40} width={80} />
-          )}
         </div>
 
         <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-white/10 text-center">
@@ -59,7 +53,7 @@ export function StockCard({ stock, onClick }: StockCardProps) {
           <div>
             <p className="text-xs text-gray-400">P/E</p>
             <p className="font-medium text-white text-sm">
-              {stock.peRatio?.toFixed(2) || 'N/A'}
+              {stock.pe?.toFixed(2) || 'N/A'}
             </p>
           </div>
         </div>

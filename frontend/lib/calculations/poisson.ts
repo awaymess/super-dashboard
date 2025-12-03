@@ -98,3 +98,56 @@ export function calculateMatchProbabilities(
     awayWin: prediction.awayWinProb,
   };
 }
+
+/**
+ * Calculate Poisson probability distribution for goals
+ * @param lambda - Expected number of goals
+ * @param maxGoals - Maximum number of goals to calculate
+ * @returns Array of probabilities for 0, 1, 2, ... maxGoals
+ */
+export function calculatePoissonProbabilities(lambda: number, maxGoals: number): number[] {
+  const probabilities: number[] = [];
+  for (let k = 0; k <= maxGoals; k++) {
+    probabilities.push(poissonProbability(lambda, k));
+  }
+  return probabilities;
+}
+
+/**
+ * Calculate goal outcome probabilities (home win, draw, away win, over/under 2.5)
+ * @param homeExpectedGoals - Expected home team goals
+ * @param awayExpectedGoals - Expected away team goals
+ * @returns Object with probabilities for home win, draw, away win, over 2.5, under 2.5, BTTS
+ */
+export function calculateGoalProbabilities(
+  homeExpectedGoals: number,
+  awayExpectedGoals: number
+): { homeWin: number; draw: number; awayWin: number; over25: number; under25: number; btts: number } {
+  const maxGoals = 10;
+  let homeWin = 0;
+  let draw = 0;
+  let awayWin = 0;
+  let over25 = 0;
+  let btts = 0;
+
+  for (let i = 0; i <= maxGoals; i++) {
+    for (let j = 0; j <= maxGoals; j++) {
+      const prob = poissonProbability(homeExpectedGoals, i) * poissonProbability(awayExpectedGoals, j);
+      if (i > j) homeWin += prob;
+      else if (i === j) draw += prob;
+      else awayWin += prob;
+      
+      if (i + j > 2) over25 += prob;
+      if (i > 0 && j > 0) btts += prob;
+    }
+  }
+
+  return {
+    homeWin,
+    draw,
+    awayWin,
+    over25,
+    under25: 1 - over25,
+    btts,
+  };
+}

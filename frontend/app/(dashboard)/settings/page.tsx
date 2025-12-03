@@ -27,10 +27,10 @@ export default function SettingsPage() {
 
       <Tabs
         tabs={[
-          { id: 'profile', label: 'Profile', icon: User },
-          { id: 'notifications', label: 'Notifications', icon: Bell },
-          { id: 'security', label: 'Security', icon: Shield },
-          { id: 'appearance', label: 'Appearance', icon: Palette },
+          { id: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> },
+          { id: 'notifications', label: 'Notifications', icon: <Bell className="w-4 h-4" /> },
+          { id: 'security', label: 'Security', icon: <Shield className="w-4 h-4" /> },
+          { id: 'appearance', label: 'Appearance', icon: <Palette className="w-4 h-4" /> },
         ]}
         activeTab={selectedTab}
         onChange={setSelectedTab}

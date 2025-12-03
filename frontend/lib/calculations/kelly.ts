@@ -102,3 +102,38 @@ export function simulateKellyGrowth(
     maxDrawdown,
   };
 }
+
+/**
+ * Calculate full Kelly criterion stake as a fraction
+ * @param probability - Win probability (0 to 1)
+ * @param odds - Decimal odds
+ * @returns Kelly stake as a fraction of bankroll
+ */
+export function calculateFullKelly(probability: number, odds: number): number {
+  if (probability <= 0 || probability >= 1 || odds <= 1) return 0;
+  const p = probability;
+  const q = 1 - p;
+  const b = odds - 1;
+  const kelly = (b * p - q) / b;
+  return Math.max(0, kelly);
+}
+
+/**
+ * Calculate half Kelly criterion stake as a fraction
+ * @param probability - Win probability (0 to 1)
+ * @param odds - Decimal odds
+ * @returns Half Kelly stake as a fraction of bankroll
+ */
+export function calculateHalfKelly(probability: number, odds: number): number {
+  return calculateFullKelly(probability, odds) * 0.5;
+}
+
+/**
+ * Calculate quarter Kelly criterion stake as a fraction
+ * @param probability - Win probability (0 to 1)
+ * @param odds - Decimal odds
+ * @returns Quarter Kelly stake as a fraction of bankroll
+ */
+export function calculateQuarterKelly(probability: number, odds: number): number {
+  return calculateFullKelly(probability, odds) * 0.25;
+}
