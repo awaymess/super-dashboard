@@ -5,15 +5,15 @@ import { DollarSign, TrendingUp, Trophy, Target, ArrowUp, ArrowDown } from 'luci
 import { GlassCard, Badge } from '@/components/ui';
 import { StatsCard, PerformanceChart } from '@/components/analytics';
 import { AreaChart, DoughnutChart } from '@/components/charts';
-import { mockMatches, mockStocks, mockPortfolio } from '@/lib/mock-data';
+import { matches, stocks, portfolio } from '@/lib/mock-data';
 
 export default function DashboardPage() {
   const performanceData = [10000, 10500, 10200, 11000, 10800, 11500, 12000, 11800, 12500, 13000];
   const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
 
-  const topStocks = mockStocks.slice(0, 5);
-  const liveMatches = mockMatches.filter(m => m.status === 'live').slice(0, 3);
-  const upcomingMatches = mockMatches.filter(m => m.status === 'upcoming').slice(0, 3);
+  const topStocks = stocks.slice(0, 5);
+  const liveMatches = matches.filter(m => m.status === 'live').slice(0, 3);
+  const upcomingMatches = matches.filter(m => m.status === 'scheduled').slice(0, 3);
 
   return (
     <div className="space-y-6">
@@ -30,8 +30,8 @@ export default function DashboardPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <StatsCard
             title="Portfolio Value"
-            value={`$${mockPortfolio.totalValue.toLocaleString()}`}
-            change={mockPortfolio.totalPnLPercent}
+            value={`$${portfolio.totalValue.toLocaleString()}`}
+            change={portfolio.performance.totalReturnPercent}
             icon={DollarSign}
             color="primary"
           />
@@ -141,7 +141,7 @@ export default function DashboardPage() {
                     <Badge variant="warning">{match.league}</Badge>
                     <div>
                       <p className="font-medium text-white text-sm">{match.homeTeam.name} vs {match.awayTeam.name}</p>
-                      <p className="text-xs text-gray-400">{match.startTime}</p>
+                      <p className="text-xs text-gray-400">{match.date + ' - ' + match.time}</p>
                     </div>
                   </div>
                   {match.odds && (

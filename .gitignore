@@ -1,0 +1,49 @@
+# Global
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Node / Next.js (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env*
+frontend/.turbo/
+frontend/.vercel/
+frontend/coverage/
+
+# Build artifacts
+dist/
+build/
+
+# Go (backend)
+backend/bin/
+backend/build/
+backend/.env*
+backend/coverage/
+backend/*.test
+backend/*.out
+backend/.cache/
+
+# Go modules cache (optional if vendored)
+backend/vendor/
+
+# Docker
+*.pid
+docker-compose.override.yml
+.docker/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.code-workspace
+
+# OS / Misc
+ehthumbs.db
+Icon?
+
+# Logs at root
+logs/

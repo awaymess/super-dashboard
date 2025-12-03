@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Trophy, Zap, Calendar, Clock, Filter } from 'lucide-react';
 import { GlassCard, GlassButton, Badge, Tabs } from '@/components/ui';
 import { MatchCard, ValueBetCard, BetSlip, KellyCalculator, PoissonCalculator } from '@/components/betting';
-import { mockMatches, mockValueBets } from '@/lib/mock-data';
+import { matches } from '@/lib/mock-data';
 import type { Bet } from '@/types/betting';
 
 export default function BettingPage() {
@@ -13,20 +13,35 @@ export default function BettingPage() {
   const [bets, setBets] = useState<Bet[]>([]);
   const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'upcoming'>('all');
 
-  const filteredMatches = mockMatches.filter(m => 
+  const filteredMatches = matches.filter(m => 
     statusFilter === 'all' || m.status === statusFilter
   );
 
-  const addBet = (match: typeof mockMatches[0], selection: string, odds: number) => {
+  const addBet = (match: typeof matches[0], selection: string, odds: number) => {
     const newBet: Bet = {
       id: `${match.id}-${selection}`,
-      match: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
-      selection,
+      matchId: match.id,
+      match,
+      betType: selection,
       odds,
       stake: 10,
+      potentialWin: 10 * odds,
+      status: 'pending',
+      placedAt: new Date().toISOString(),
     };
     setBets(prev => [...prev.filter(b => b.id !== newBet.id), newBet]);
   };
+
+  //  const addBet = (match: typeof mockMatches[0], selection: string, odds: number) => {
+  //   const newBet: Bet = {
+  //     id: `${match.id}-${selection}`,
+  //     match: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
+  //     selection,
+  //     odds,
+  //     stake: 10,
+  //   };
+  //   setBets(prev => [...prev.filter(b => b.id !== newBet.id), newBet]);
+  // };
 
   const removeBet = (id: string) => {
     setBets(prev => prev.filter(b => b.id !== id));
@@ -46,9 +61,9 @@ export default function BettingPage() {
 
       <Tabs
         tabs={[
-          { id: 'matches', label: 'Matches', icon: Calendar },
-          { id: 'value-bets', label: 'Value Bets', icon: Zap },
-          { id: 'calculators', label: 'Calculators', icon: Clock },
+          { id: 'matches', label: 'Matches', icon: <Calendar /> },
+          { id: 'value-bets', label: 'Value Bets', icon: <Zap /> },
+          { id: 'calculators', label: 'Calculators', icon: <Clock /> },
         ]}
         activeTab={selectedTab}
         onChange={setSelectedTab}
@@ -81,9 +96,9 @@ export default function BettingPage() {
           {selectedTab === 'value-bets' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid gap-4">
-                {mockValueBets.map((valueBet) => (
+                {/* {mockValueBets.map((valueBet) => (
                   <ValueBetCard key={valueBet.id} valueBet={valueBet} />
-                ))}
+                ))} */}
               </div>
             </motion.div>
           )}

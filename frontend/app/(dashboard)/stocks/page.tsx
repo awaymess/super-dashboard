@@ -5,14 +5,14 @@ import { motion } from 'framer-motion';
 import { LineChart as LineChartIcon, Search, Filter, Star, TrendingUp, TrendingDown } from 'lucide-react';
 import { GlassCard, GlassInput, GlassButton, Badge, Tabs } from '@/components/ui';
 import { StockCard, WatchlistCard, SectorHeatmap, NewsCard } from '@/components/stocks';
-import { mockStocks, mockNews } from '@/lib/mock-data';
+import { stocks, news } from '@/lib/mock-data';
 
 export default function StocksPage() {
   const [selectedTab, setSelectedTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const [watchlist, setWatchlist] = useState(mockStocks.slice(0, 5));
+  const [watchlist, setWatchlist] = useState(stocks.slice(0, 5));
 
-  const filteredStocks = mockStocks.filter(stock =>
+  const filteredStocks = stocks.filter(stock =>
     stock.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
     stock.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -28,8 +28,8 @@ export default function StocksPage() {
     { name: 'Utilities', change: 0.12 },
   ];
 
-  const gainers = [...mockStocks].sort((a, b) => b.changePercent - a.changePercent).slice(0, 5);
-  const losers = [...mockStocks].sort((a, b) => a.changePercent - b.changePercent).slice(0, 5);
+  const gainers = [...stocks].sort((a, b) => b.changePercent - a.changePercent).slice(0, 5);
+  const losers = [...stocks].sort((a, b) => a.changePercent - b.changePercent).slice(0, 5);
 
   return (
     <div className="space-y-6">
@@ -133,7 +133,7 @@ export default function StocksPage() {
 
       {selectedTab === 'news' && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid gap-4">
-          {mockNews.map((news) => (
+          {news.map((news) => (
             <NewsCard key={news.id} news={news} />
           ))}
         </motion.div>

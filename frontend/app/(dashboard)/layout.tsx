@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useState } from 'react';
 import { Sidebar, Header, CommandPalette, LiquidBackground } from '@/components/layout';
 import { KeyboardShortcutsHelp } from '@/components/common';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
@@ -14,17 +13,8 @@ export default function DashboardLayout({
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
-  const router = useRouter();
 
-  useKeyboardShortcuts([
-    { key: 'k', ctrl: true, action: () => setCommandPaletteOpen(true) },
-    { key: 'd', action: () => router.push('/dashboard') },
-    { key: 'b', action: () => router.push('/betting') },
-    { key: 's', action: () => router.push('/stocks') },
-    { key: 'p', action: () => router.push('/paper-trading') },
-    { key: 'a', action: () => router.push('/analytics') },
-    { key: '?', action: () => setShortcutsHelpOpen(true) },
-  ]);
+  useKeyboardShortcuts();
 
   return (
     <div className="min-h-screen bg-background">
