@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import '../styles/animations.css';
 import { StoreProvider } from '@/store/provider';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Super Dashboard - Sports Betting & Stock Analytics',
@@ -18,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} bg-background text-white antialiased`}>
+      <body className="font-sans bg-background text-white antialiased">
         <StoreProvider>
           {children}
         </StoreProvider>
