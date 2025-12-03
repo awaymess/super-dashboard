@@ -1,4 +1,4 @@
-import { Match, Team, H2HRecord } from '@/types/betting';
+import { Match, Team, H2HRecord, ValueBet } from '@/types/betting';
 
 const teams: Record<string, Team> = {
   'manu': { id: 'manu', name: 'Manchester United', shortName: 'MUN', form: ['W', 'D', 'W', 'L', 'W'], goalsScoredAvg: 1.8, goalsConcededAvg: 1.2, cleanSheetPct: 35 },
@@ -104,8 +104,6 @@ export const matches: Match[] = [
   { id: '49', homeTeam: teams.crystalpalace, awayTeam: teams.arsenal, league: 'Premier League', leagueCountry: 'England', date: '2025-01-23', time: '20:00', status: 'scheduled', odds: { home: 4.00, draw: 3.50, away: 1.90, over25: 1.85, under25: 1.95, btts: 1.80, bttsNo: 2.00, homeDouble: 1.88, awayDouble: 1.32 }, h2h: generateH2H(teams.crystalpalace, teams.arsenal) },
   { id: '50', homeTeam: teams.westham, awayTeam: teams.liverpool, league: 'Premier League', leagueCountry: 'England', date: '2025-01-24', time: '20:00', status: 'scheduled', odds: { home: 4.50, draw: 3.80, away: 1.75, over25: 1.70, under25: 2.15, btts: 1.75, bttsNo: 2.10, homeDouble: 2.08, awayDouble: 1.28 }, h2h: generateH2H(teams.westham, teams.liverpool) },
 ];
-
-import { ValueBet } from '@/types/betting';
 
 // Generate value bets from matches with positive expected value
 export const valueBets: ValueBet[] = [
