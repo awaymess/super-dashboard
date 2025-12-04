@@ -198,3 +198,94 @@ func TestAuthHandler_Login(t *testing.T) {
 		})
 	}
 }
+
+func TestAuthHandler_Refresh(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockService := newMockAuthService()
+	handler := NewAuthHandler(mockService)
+
+	router := gin.New()
+	v1 := router.Group("/api/v1")
+	handler.RegisterAuthRoutes(v1)
+
+	// First register and login to get a refresh token
+	registerBody := RegisterRequest{
+		Email:    "refresh@example.com",
+		Password: "password123",
+		Name:     "Refresh User",
+	}
+	bodyBytes, _ := json.Marshal(registerBody)
+	req, _ := http.NewRequest(http.MethodPost, "/api/v1/auth/register", bytes.NewBuffer(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	loginBody := LoginRequest{
+		Email:    "refresh@example.com",
+		Password: "password123",
+	}
+	bodyBytes, _ = json.Marshal(loginBody)
+	req, _ = http.NewRequest(http.MethodPost, "/api/v1/auth/login", bytes.NewBuffer(bodyBytes))
+	req.Header.Set("Content-Type", "application/json")
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+
+	var loginResponse LoginResponse
+	if err := json.Unmarshal(w.Body.Bytes(), &loginResponse); err != nil {
+		t.Fatalf("Failed to unmarshal login response: %v", err)
+	}
+
+	tests := []struct {
+		name       string
+		body       RefreshRequest
+		wantStatus int
+	}{
+		{
+			name: "valid refresh",
+			body: RefreshRequest{
+				RefreshToken: loginResponse.RefreshToken,
+			},
+			wantStatus: http.StatusOK,
+		},
+		{
+			name: "invalid refresh token",
+			body: RefreshRequest{
+				RefreshToken: "invalid-token",
+			},
+			wantStatus: http.StatusUnauthorized,
+		},
+		{
+			name: "empty refresh token",
+			body: RefreshRequest{
+				RefreshToken: "",
+			},
+			wantStatus: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			bodyBytes, _ := json.Marshal(tt.body)
+			req, _ := http.NewRequest(http.MethodPost, "/api/v1/auth/refresh", bytes.NewBuffer(bodyBytes))
+			req.Header.Set("Content-Type", "application/json")
+
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
+
+			if w.Code != tt.wantStatus {
+				t.Errorf("Expected status %d, got %d. Body: %s", tt.wantStatus, w.Code, w.Body.String())
+			}
+
+			if tt.wantStatus == http.StatusOK {
+				var response RefreshResponse
+				if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+					t.Errorf("Failed to unmarshal response: %v", err)
+				}
+				if response.AccessToken == "" {
+					t.Error("Expected access token to be set")
+				}
+			}
+		})
+	}
+}
