@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
 )
 
 // ErrNotFound is returned when a requested resource is not found.

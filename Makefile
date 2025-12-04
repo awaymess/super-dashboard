@@ -1,4 +1,4 @@
-.PHONY: install dev build test clean docker-up docker-down logs migrate-up
+.PHONY: install dev build run test clean docker-up docker-down logs migrate-up
 
 # Install dependencies
 install:
@@ -12,6 +12,10 @@ dev:
 	cd backend && go run cmd/server/main.go &
 	@echo "Starting frontend..."
 	cd frontend && npm run dev
+
+# Run backend server only
+run:
+	cd backend && go run ./cmd/server
 
 # Build for production
 build:

@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
+	"net/http"
+	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -13,6 +19,7 @@ import (
 	"github.com/superdashboard/backend/pkg/database"
 	"github.com/superdashboard/backend/pkg/logger"
 	"github.com/superdashboard/backend/pkg/nlp"
+	"github.com/superdashboard/backend/pkg/redis"
 )
 
 func main() {
@@ -92,7 +99,7 @@ func main() {
 		betHandler.RegisterBetRoutes(v1)
 		log.Info().Msg("Betting endpoints registered")
 
-		// Initialize paper trading handler (mock mode)
+		// Initialize paper trading handler (mock mode - legacy endpoints)
 		paperTradingHandler := handler.NewPaperTradingHandler()
 		paperTradingHandler.RegisterPaperTradingRoutes(v1)
 		log.Info().Msg("Paper trading endpoints registered")
@@ -104,6 +111,22 @@ func main() {
 		nlpHandler := handler.NewNLPHandler(nlpService)
 		nlpHandler.RegisterNLPRoutes(v1)
 		log.Info().Msg("NLP endpoints registered")
+		// Initialize paper trading with in-memory repositories (new /paper endpoints)
+		portfolioRepo := repository.NewInMemoryPortfolioRepository()
+		positionRepo := repository.NewInMemoryPositionRepository()
+		orderRepo := repository.NewInMemoryOrderRepository()
+		tradeRepo := repository.NewInMemoryTradeRepository()
+
+		// Seed default portfolio with some positions
+		if _, err := repository.SeedDefaultPortfolio(portfolioRepo, positionRepo); err != nil {
+			log.Warn().Err(err).Msg("Failed to seed default portfolio")
+		}
+
+		// Initialize paper trading service with mock price provider
+		paperService := service.NewPaperTradingService(portfolioRepo, positionRepo, orderRepo, tradeRepo, nil)
+		paperHandler := handler.NewPaperHandler(paperService)
+		paperHandler.RegisterPaperRoutes(v1)
+		log.Info().Msg("Paper trading API endpoints registered (/api/v1/paper)")
 
 		log.Info().Msg("Running with mock data mode")
 	} else if cfg.DatabaseURL != "" {
@@ -132,27 +155,76 @@ func main() {
 
 		// Initialize repositories
 		userRepo := repository.NewUserRepository(db)
+		portfolioRepo := repository.NewPortfolioRepository(db)
+		positionRepo := repository.NewPositionRepository(db)
+		orderRepo := repository.NewOrderRepository(db)
+		tradeRepo := repository.NewTradeRepository(db)
+
+		// Initialize Redis for token storage (optional)
+		var tokenStore service.TokenStore
+		if cfg.RedisURL != "" {
+			redisClient, err := redis.Connect(cfg.RedisURL)
+			if err != nil {
+				log.Warn().Err(err).Msg("Failed to connect to Redis, continuing without token persistence")
+			} else {
+				tokenStore = redisClient
+				// Add Redis health checker
+				healthHandler.AddHealthChecker(func() (string, bool, string) {
+					if err := redisClient.Ping(context.Background()); err != nil {
+						return "redis", false, err.Error()
+					}
+					return "redis", true, "connected"
+				})
+				log.Info().Msg("Connected to Redis for token storage")
+			}
+		}
 
 		// Initialize services
-		authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+		authService := service.NewAuthService(userRepo, cfg.JWTSecret, tokenStore)
 
 		// Initialize handlers
 		authHandler := handler.NewAuthHandler(authService)
+		paperHandler := handler.NewPaperHandler(paperService)
 
 		// Register routes
 		authHandler.RegisterAuthRoutes(v1)
+		paperHandler.RegisterPaperRoutes(v1)
 
 		log.Info().Msg("Database-backed services initialized")
 	} else {
 		log.Warn().Msg("No database URL configured and not in mock mode")
 	}
 
-	// Start server
+	// Start server with graceful shutdown
 	addr := ":" + cfg.Port
-	log.Info().Str("addr", addr).Msg("Starting server")
-	if err := r.Run(addr); err != nil {
-		log.Fatal().Err(err).Msg("Failed to start server")
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: r,
 	}
+
+	// Start server in a goroutine
+	go func() {
+		log.Info().Str("addr", addr).Msg("Starting server")
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal().Err(err).Msg("Failed to start server")
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Info().Msg("Shutting down server...")
+
+	// Create a deadline for shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal().Err(err).Msg("Server forced to shutdown")
+	}
+
+	log.Info().Msg("Server exited gracefully")
 }
 
 // findMockDir finds the mock data directory.

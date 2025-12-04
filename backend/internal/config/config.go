@@ -31,6 +31,12 @@ type Config struct {
 	// API Keys (optional)
 	OddsAPIKey         string `mapstructure:"ODDS_API_KEY"`
 	AlphaVantageAPIKey string `mapstructure:"ALPHA_VANTAGE_API_KEY"`
+
+	// OpenAI / NLP configuration (optional)
+	OpenAIAPIKey string `mapstructure:"OPENAI_API_KEY"`
+
+	// Vector Database configuration (optional)
+	VectorDBDSN string `mapstructure:"VECTOR_DB_DSN"`
 }
 
 // Load loads configuration from environment variables and .env file.
@@ -63,7 +69,7 @@ func Load() (*Config, error) {
 	envKeys := []string{
 		"ENV", "PORT", "DATABASE_URL", "REDIS_URL", "JWT_SECRET",
 		"USE_MOCK_DATA", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET",
-		"ODDS_API_KEY", "ALPHA_VANTAGE_API_KEY",
+		"ODDS_API_KEY", "ALPHA_VANTAGE_API_KEY", "OPENAI_API_KEY", "VECTOR_DB_DSN",
 	}
 	for _, key := range envKeys {
 		if err := viper.BindEnv(key); err != nil {
