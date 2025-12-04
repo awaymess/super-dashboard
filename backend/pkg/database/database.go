@@ -2,7 +2,7 @@ package database
 
 import (
 	"github.com/rs/zerolog/log"
-	"github.com/superdashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
