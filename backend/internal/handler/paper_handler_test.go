@@ -314,8 +314,8 @@ func TestPaperHandler_ListPortfolios(t *testing.T) {
 
 	// Create test portfolios
 	userID := uuid.New()
-	mockService.CreatePortfolio(userID, "Portfolio 1", 100000)
-	mockService.CreatePortfolio(userID, "Portfolio 2", 50000)
+	_, _ = mockService.CreatePortfolio(userID, "Portfolio 1", 100000)
+	_, _ = mockService.CreatePortfolio(userID, "Portfolio 2", 50000)
 
 	t.Run("list all portfolios", func(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/paper/portfolios", nil)
@@ -569,7 +569,7 @@ func TestPaperHandler_GetTrades(t *testing.T) {
 	portfolio, _ := mockService.CreatePortfolio(userID, "Test Portfolio", 100000)
 
 	// Create an order (which creates a trade)
-	mockService.CreateOrder(portfolio.ID, "AAPL", model.OrderSideBuy, model.OrderTypeMarket, 10, 0)
+	_, _, _ = mockService.CreateOrder(portfolio.ID, "AAPL", model.OrderSideBuy, model.OrderTypeMarket, 10, 0)
 
 	t.Run("get trades with valid portfolio_id", func(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodGet, "/api/v1/paper/trades?portfolio_id="+portfolio.ID.String(), nil)
