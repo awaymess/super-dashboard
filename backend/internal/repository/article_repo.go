@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
 )
 
 // ArticleRepository defines the interface for article data operations.

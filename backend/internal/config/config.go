@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"os"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -37,6 +38,24 @@ type Config struct {
 
 	// Vector Database configuration (optional)
 	VectorDBDSN string `mapstructure:"VECTOR_DB_DSN"`
+}
+
+// parseBoolEnv parses a boolean from a string value,
+// recognizing "false", "0", "FALSE", "False", "no", "NO" as false,
+// and "true", "1", "TRUE", "True", "yes", "YES" as true.
+// Returns the default value if the string is empty or not recognized.
+func parseBoolEnv(value string, defaultVal bool) bool {
+	if value == "" {
+		return defaultVal
+	}
+	switch strings.ToLower(strings.TrimSpace(value)) {
+	case "false", "0", "no", "off":
+		return false
+	case "true", "1", "yes", "on":
+		return true
+	default:
+		return defaultVal
+	}
 }
 
 // Load loads configuration from environment variables and .env file.
@@ -80,6 +99,12 @@ func Load() (*Config, error) {
 	cfg := &Config{}
 	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err
+	}
+
+	// Robust parsing of USE_MOCK_DATA - handle string values explicitly
+	// This ensures values like "false", "0", "FALSE" are properly recognized
+	if envVal := os.Getenv("USE_MOCK_DATA"); envVal != "" {
+		cfg.UseMockData = parseBoolEnv(envVal, true)
 	}
 
 	return cfg, nil

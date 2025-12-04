@@ -322,10 +322,10 @@ func TestWebSocketHandler_BroadcastToConnectedClients(t *testing.T) {
 		Type:    EventNotificationNew,
 		Payload: map[string]interface{}{"message": "Hello, World!"},
 	}
-	hub.Broadcast(event)
+	_ = hub.Broadcast(event)
 
 	// Read message from WebSocket
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 	_, message, err := conn.ReadMessage()
 	if err != nil {
 		t.Fatalf("Failed to read message: %v", err)
@@ -380,7 +380,7 @@ func TestHub_ConcurrentOperations(t *testing.T) {
 				Type:    EventStockPriceUpdate,
 				Payload: map[string]interface{}{"index": idx},
 			}
-			hub.Broadcast(event)
+			_ = hub.Broadcast(event)
 		}(i)
 	}
 	wg.Wait()

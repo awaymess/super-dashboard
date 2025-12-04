@@ -13,12 +13,18 @@ version: '3.8'
 #   - VECTOR_DB_DSN: Vector database DSN for embeddings (optional)
 #
 # Usage:
-#   docker-compose up -d        # Start all services
-#   docker-compose down         # Stop all services
-#   docker-compose logs -f      # View logs
+#   docker-compose up -d                          # Start all services (mock mode)
+#   USE_MOCK_DATA=false docker-compose up -d      # Start in real mode
+#   docker-compose down                           # Stop all services
+#   docker-compose logs -f                        # View logs
 #
-# Note: When USE_MOCK_DATA=true, the backend will use mock repositories
+# Note: When USE_MOCK_DATA=true (default), the backend will use mock repositories
 # and health checks will return "ready" status (no DB/Redis checks are performed).
+#
+# When USE_MOCK_DATA=false, the backend will:
+#   - Connect to PostgreSQL database for data persistence
+#   - Connect to Redis for token storage
+#   - Include DB/Redis in health checks (returns 503 if unavailable)
 
 services:
   backend:
@@ -33,7 +39,8 @@ services:
       - ENV=development
       - PORT=8080
       # Mock data mode - set to false to use real database
-      - USE_MOCK_DATA=true
+      # Can be overridden: USE_MOCK_DATA=false docker-compose up -d
+      - USE_MOCK_DATA=${USE_MOCK_DATA:-true}
       # Database connection
       - DATABASE_URL=postgres://superdash:superdash123@postgres:5432/superdashboard?sslmode=disable
       # Redis connection

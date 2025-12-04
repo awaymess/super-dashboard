@@ -115,7 +115,7 @@ func NewMockStockRepository(filePath string) (StockRepository, error) {
 	files, err := filepath.Glob(filepath.Join(dir, "prices_*.json"))
 	if err == nil {
 		for _, priceFile := range files {
-			repo.loadPriceHistoryFile(priceFile)
+			_ = repo.loadPriceHistoryFile(priceFile)
 		}
 	}
 

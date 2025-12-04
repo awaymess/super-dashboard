@@ -168,8 +168,8 @@ func TestScheduler_GetJobs(t *testing.T) {
 		},
 	}
 
-	scheduler.AddJob(job1)
-	scheduler.AddJob(job2)
+	_ = scheduler.AddJob(job1)
+	_ = scheduler.AddJob(job2)
 
 	jobs := scheduler.GetJobs()
 	if len(jobs) != 2 {

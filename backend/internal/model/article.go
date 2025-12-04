@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/pkg/pq"
+	"github.com/awaymess/super-dashboard/backend/pkg/pq"
 )
 
 // Article represents a news article stored in the system.

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
 	"gorm.io/gorm"
 )
 
@@ -63,8 +63,8 @@ func TestInMemoryPortfolioRepository(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		repo.Create(portfolio1)
-		repo.Create(portfolio2)
+		_ = repo.Create(portfolio1)
+		_ = repo.Create(portfolio2)
 
 		portfolios, err := repo.GetByUserID(userID)
 		if err != nil {
@@ -86,7 +86,7 @@ func TestInMemoryPortfolioRepository(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		repo.Create(portfolio)
+		_ = repo.Create(portfolio)
 
 		portfolio.Name = "Updated Name"
 		err := repo.Update(portfolio)
@@ -110,7 +110,7 @@ func TestInMemoryPortfolioRepository(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		repo.Create(portfolio)
+		_ = repo.Create(portfolio)
 		err := repo.Delete(portfolio.ID)
 		if err != nil {
 			t.Fatalf("Delete() error = %v", err)
@@ -184,8 +184,8 @@ func TestInMemoryPositionRepository(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		repo.Create(position1)
-		repo.Create(position2)
+		_ = repo.Create(position1)
+		_ = repo.Create(position2)
 
 		positions, err := repo.GetByPortfolioID(portfolioID)
 		if err != nil {
@@ -209,7 +209,7 @@ func TestInMemoryPositionRepository(t *testing.T) {
 			UpdatedAt:   time.Now(),
 		}
 
-		repo.Create(position)
+		_ = repo.Create(position)
 
 		got, err := repo.GetByPortfolioAndSymbol(portfolioID, "NVDA")
 		if err != nil {
@@ -280,7 +280,7 @@ func TestInMemoryOrderRepository(t *testing.T) {
 			UpdatedAt:   now,
 		}
 
-		repo.Create(order1)
+		_ = repo.Create(order1)
 
 		orders, err := repo.GetByPortfolioID(portfolioID)
 		if err != nil {
@@ -338,7 +338,7 @@ func TestInMemoryTradeRepository(t *testing.T) {
 			ExecutedAt:  time.Now(),
 		}
 
-		repo.Create(trade)
+		_ = repo.Create(trade)
 
 		trades, err := repo.GetByPortfolioID(portfolioID)
 		if err != nil {

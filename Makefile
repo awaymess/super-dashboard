@@ -1,4 +1,4 @@
-.PHONY: install dev build run test clean docker-up docker-down logs migrate-up
+.PHONY: install dev build run test clean docker-up docker-down logs migrate-up test-unit test-integration
 
 # Install dependencies
 install:
@@ -27,6 +27,14 @@ test:
 	cd frontend && npm test || true
 	cd backend && go test ./...
 
+# Run unit tests only (with mock data)
+test-unit:
+	cd backend && USE_MOCK_DATA=true go test -tags=unit ./...
+
+# Run integration tests (requires Postgres and Redis)
+test-integration:
+	cd backend && go test -v -tags=integration ./...
+
 # Clean build artifacts
 clean:
 	cd frontend && rm -rf .next node_modules
@@ -47,5 +55,4 @@ logs:
 # Run database migrations (GORM AutoMigrate)
 migrate-up:
 	@echo "Running database migrations..."
-	cd backend && go run cmd/server/main.go -migrate-only || \
-		echo "Note: Migrations run automatically on server start"
+	cd backend && go run cmd/migrate/main.go
