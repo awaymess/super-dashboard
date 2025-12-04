@@ -44,16 +44,16 @@ func (h *StockHandler) GetQuote(c *gin.Context) {
 
 	stock, err := h.stockRepo.GetBySymbol(symbol)
 	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "stock not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "failed to fetch stock"})
-		return
-	}
-	if stock == nil {
-		c.JSON(http.StatusNotFound, ErrorResponse{Error: "stock not found"})
 		return
 	}
 
 	price, err := h.stockRepo.GetLatestPrice(symbol)
-	if err != nil {
+	if err != nil && err != repository.ErrNotFound {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "failed to fetch price"})
 		return
 	}
@@ -65,7 +65,7 @@ func (h *StockHandler) GetQuote(c *gin.Context) {
 		Sector:    stock.Sector,
 	}
 
-	if price != nil {
+	if err != repository.ErrNotFound && price != nil {
 		response.Price = price.Close
 		response.Open = price.Open
 		response.High = price.High

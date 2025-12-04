@@ -46,11 +46,11 @@ func (h *MatchHandler) GetMatch(c *gin.Context) {
 	id := c.Param("id")
 	match, err := h.matchRepo.GetByID(id)
 	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "match not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "failed to fetch match"})
-		return
-	}
-	if match == nil {
-		c.JSON(http.StatusNotFound, ErrorResponse{Error: "match not found"})
 		return
 	}
 	c.JSON(http.StatusOK, match)

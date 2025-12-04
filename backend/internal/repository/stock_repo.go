@@ -109,7 +109,7 @@ func (r *mockStockRepository) GetAll() ([]model.Stock, error) {
 func (r *mockStockRepository) GetBySymbol(symbol string) (*model.Stock, error) {
 	stock, ok := r.stocks[symbol]
 	if !ok {
-		return nil, nil
+		return nil, ErrNotFound
 	}
 	return &stock, nil
 }
@@ -118,7 +118,7 @@ func (r *mockStockRepository) GetBySymbol(symbol string) (*model.Stock, error) {
 func (r *mockStockRepository) GetLatestPrice(symbol string) (*model.StockPrice, error) {
 	price, ok := r.prices[symbol]
 	if !ok {
-		return nil, nil
+		return nil, ErrNotFound
 	}
 	return &price, nil
 }

@@ -2,12 +2,16 @@ package repository
 
 import (
 	"encoding/json"
+	"errors"
 	"os"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/superdashboard/backend/internal/model"
 )
+
+// ErrNotFound is returned when a requested resource is not found.
+var ErrNotFound = errors.New("resource not found")
 
 // MatchMockData represents the structure of the mock matches JSON file.
 type MatchMockData struct {
@@ -135,7 +139,7 @@ func (r *mockMatchRepository) GetAll() ([]model.Match, error) {
 func (r *mockMatchRepository) GetByID(id string) (*model.Match, error) {
 	match, ok := r.matches[id]
 	if !ok {
-		return nil, nil
+		return nil, ErrNotFound
 	}
 	return &match, nil
 }

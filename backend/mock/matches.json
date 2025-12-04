@@ -9,6 +9,7 @@
     { "id": "realmadrid", "name": "Real Madrid", "country": "Spain", "elo": 2080 },
     { "id": "barcelona", "name": "FC Barcelona", "country": "Spain", "elo": 2000 },
     { "id": "bayern", "name": "Bayern Munich", "country": "Germany", "elo": 2070 },
+    { "id": "dortmund", "name": "Borussia Dortmund", "country": "Germany", "elo": 1950 },
     { "id": "psg", "name": "Paris Saint-Germain", "country": "France", "elo": 1980 }
   ],
   "matches": [
