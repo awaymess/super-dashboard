@@ -18,6 +18,7 @@ import (
 	"github.com/superdashboard/backend/internal/service"
 	"github.com/superdashboard/backend/pkg/database"
 	"github.com/superdashboard/backend/pkg/logger"
+	"github.com/superdashboard/backend/pkg/nlp"
 	"github.com/superdashboard/backend/pkg/redis"
 )
 
@@ -103,6 +104,13 @@ func main() {
 		paperTradingHandler.RegisterPaperTradingRoutes(v1)
 		log.Info().Msg("Paper trading endpoints registered")
 
+		// Initialize NLP handler (mock mode)
+		nlpProvider := nlp.NewMockProvider()
+		articleRepo := repository.NewInMemoryArticleRepository()
+		nlpService := service.NewNLPService(nlpProvider, articleRepo)
+		nlpHandler := handler.NewNLPHandler(nlpService)
+		nlpHandler.RegisterNLPRoutes(v1)
+		log.Info().Msg("NLP endpoints registered")
 		// Initialize paper trading with in-memory repositories (new /paper endpoints)
 		portfolioRepo := repository.NewInMemoryPortfolioRepository()
 		positionRepo := repository.NewInMemoryPositionRepository()
