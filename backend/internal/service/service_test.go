@@ -61,7 +61,7 @@ func (m *mockUserRepository) Delete(id uuid.UUID) error {
 
 func TestAuthService_Register(t *testing.T) {
 	mockRepo := newMockUserRepository()
-	authService := NewAuthService(mockRepo, "test-secret")
+	authService := NewAuthService(mockRepo, "test-secret", nil)
 
 	// Test successful registration
 	user, err := authService.Register("test@example.com", "password123", "Test User")
@@ -94,7 +94,7 @@ func TestAuthService_Register(t *testing.T) {
 
 func TestAuthService_Login(t *testing.T) {
 	mockRepo := newMockUserRepository()
-	authService := NewAuthService(mockRepo, "test-secret")
+	authService := NewAuthService(mockRepo, "test-secret", nil)
 
 	// Register a user first
 	_, err := authService.Register("test@example.com", "password123", "Test User")
@@ -131,7 +131,7 @@ func TestAuthService_Login(t *testing.T) {
 
 func TestAuthService_ValidateToken(t *testing.T) {
 	mockRepo := newMockUserRepository()
-	authService := NewAuthService(mockRepo, "test-secret")
+	authService := NewAuthService(mockRepo, "test-secret", nil)
 
 	// Register and login
 	_, err := authService.Register("test@example.com", "password123", "Test User")
@@ -164,7 +164,7 @@ func TestAuthService_ValidateToken(t *testing.T) {
 
 func TestAuthService_RefreshToken(t *testing.T) {
 	mockRepo := newMockUserRepository()
-	authService := NewAuthService(mockRepo, "test-secret")
+	authService := NewAuthService(mockRepo, "test-secret", nil)
 
 	// Register and login
 	_, err := authService.Register("test@example.com", "password123", "Test User")
