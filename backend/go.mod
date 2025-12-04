@@ -1,4 +1,4 @@
-module github.com/superdashboard/backend
+module github.com/awaymess/super-dashboard/backend
 
 go 1.23.0
 

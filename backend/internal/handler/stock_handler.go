@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/superdashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
 )
 
 // StockQuoteResponse represents a stock quote response.

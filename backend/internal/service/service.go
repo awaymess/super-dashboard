@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/superdashboard/backend/internal/model"
-	"github.com/superdashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
 )
 
 // Token duration constants.
