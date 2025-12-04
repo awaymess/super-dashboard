@@ -75,7 +75,8 @@ func TestStockPriceIngester_IngestMockPrices(t *testing.T) {
 }
 
 func TestStockPriceIngester_Job(t *testing.T) {
-	ingester := NewStockPriceIngester("/tmp", true)
+	tmpDir := t.TempDir()
+	ingester := NewStockPriceIngester(tmpDir, true)
 	job := ingester.IngestMockPricesJob()
 
 	if job.Name != "MockPriceIngestion" {
