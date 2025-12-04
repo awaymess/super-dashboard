@@ -1,8 +1,11 @@
 package config
 
 import (
+	"errors"
+	"os"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 )
 
@@ -43,24 +46,31 @@ func Load() (*Config, error) {
 	viper.SetDefault("PORT", "8080")
 	viper.SetDefault("USE_MOCK_DATA", true)
 
-	// Read .env file if present (ignore error if not found)
-	_ = viper.ReadInConfig()
+	// Read .env file if present
+	if err := viper.ReadInConfig(); err != nil {
+		var configFileNotFoundError viper.ConfigFileNotFoundError
+		if errors.As(err, &configFileNotFoundError) {
+			log.Debug().Msg("No .env file found, using environment variables and defaults")
+		} else if !os.IsNotExist(err) {
+			log.Warn().Err(err).Msg("Error reading config file")
+		}
+	}
 
 	// Bind environment variables
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	// Explicitly bind all config keys to their environment variable names
-	_ = viper.BindEnv("ENV")
-	_ = viper.BindEnv("PORT")
-	_ = viper.BindEnv("DATABASE_URL")
-	_ = viper.BindEnv("REDIS_URL")
-	_ = viper.BindEnv("JWT_SECRET")
-	_ = viper.BindEnv("USE_MOCK_DATA")
-	_ = viper.BindEnv("GOOGLE_CLIENT_ID")
-	_ = viper.BindEnv("GOOGLE_CLIENT_SECRET")
-	_ = viper.BindEnv("ODDS_API_KEY")
-	_ = viper.BindEnv("ALPHA_VANTAGE_API_KEY")
+	envKeys := []string{
+		"ENV", "PORT", "DATABASE_URL", "REDIS_URL", "JWT_SECRET",
+		"USE_MOCK_DATA", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET",
+		"ODDS_API_KEY", "ALPHA_VANTAGE_API_KEY",
+	}
+	for _, key := range envKeys {
+		if err := viper.BindEnv(key); err != nil {
+			log.Warn().Str("key", key).Err(err).Msg("Failed to bind environment variable")
+		}
+	}
 
 	cfg := &Config{}
 	if err := viper.Unmarshal(cfg); err != nil {

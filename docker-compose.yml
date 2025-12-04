@@ -14,7 +14,8 @@ services:
       - USE_MOCK_DATA=true
       - DATABASE_URL=postgres://superdash:superdash123@postgres:5432/superdashboard?sslmode=disable
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      # SECURITY: Change this secret in production! Use a strong random value.
+      - JWT_SECRET=${JWT_SECRET:-CHANGE_ME_IN_PRODUCTION_use_strong_random_secret}
     depends_on:
       postgres:
         condition: service_healthy
