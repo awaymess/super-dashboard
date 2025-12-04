@@ -2,8 +2,11 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/superdashboard/backend/internal/model"
 	"github.com/superdashboard/backend/internal/repository"
 )
 
@@ -18,6 +21,12 @@ type StockQuoteResponse struct {
 	Volume    int64   `json:"volume"`
 	MarketCap float64 `json:"market_cap"`
 	Sector    string  `json:"sector"`
+}
+
+// StockPriceHistoryResponse represents a stock price history response.
+type StockPriceHistoryResponse struct {
+	Symbol string             `json:"symbol"`
+	Prices []model.StockPrice `json:"prices"`
 }
 
 // StockHandler handles stock-related HTTP requests.
@@ -40,7 +49,7 @@ func NewStockHandler(stockRepo repository.StockRepository) *StockHandler {
 // @Failure 404 {object} ErrorResponse
 // @Router /api/v1/stocks/quotes/{symbol} [get]
 func (h *StockHandler) GetQuote(c *gin.Context) {
-	symbol := c.Param("symbol")
+	symbol := strings.ToUpper(c.Param("symbol"))
 
 	stock, err := h.stockRepo.GetBySymbol(symbol)
 	if err != nil {
@@ -76,6 +85,58 @@ func (h *StockHandler) GetQuote(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetHistory returns the price history for a stock.
+// @Summary Get stock price history
+// @Description Get the price history for a stock by symbol
+// @Tags stocks
+// @Produce json
+// @Param symbol path string true "Stock symbol"
+// @Param limit query int false "Number of historical prices to return (default 30)"
+// @Success 200 {object} StockPriceHistoryResponse
+// @Failure 404 {object} ErrorResponse
+// @Router /api/v1/stocks/{symbol}/history [get]
+func (h *StockHandler) GetHistory(c *gin.Context) {
+	symbol := strings.ToUpper(c.Param("symbol"))
+
+	// Parse limit query parameter (default 30)
+	limit := 30
+	if limitStr := c.Query("limit"); limitStr != "" {
+		if parsed, err := strconv.Atoi(limitStr); err == nil && parsed > 0 {
+			limit = parsed
+		}
+	}
+
+	// Check if stock exists
+	stock, err := h.stockRepo.GetBySymbol(symbol)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusNotFound, ErrorResponse{Error: "stock not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "failed to fetch stock"})
+		return
+	}
+
+	// Get price history
+	prices, err := h.stockRepo.GetPriceHistory(symbol, limit)
+	if err != nil {
+		if err == repository.ErrNotFound {
+			c.JSON(http.StatusOK, StockPriceHistoryResponse{
+				Symbol: stock.Symbol,
+				Prices: []model.StockPrice{},
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, ErrorResponse{Error: "failed to fetch price history"})
+		return
+	}
+
+	c.JSON(http.StatusOK, StockPriceHistoryResponse{
+		Symbol: stock.Symbol,
+		Prices: prices,
+	})
+}
+
 // ListStocks returns all available stocks.
 // @Summary List all stocks
 // @Description Get a list of all available stocks
@@ -98,5 +159,6 @@ func (h *StockHandler) RegisterStockRoutes(rg *gin.RouterGroup) {
 	{
 		stocks.GET("", h.ListStocks)
 		stocks.GET("/quotes/:symbol", h.GetQuote)
+		stocks.GET("/:symbol/history", h.GetHistory)
 	}
 }
