@@ -1,0 +1,360 @@
+SUPER DASHBOARD - FINAL SPECIFICATION
+
+================================================================================
+PROJECT OVERVIEW
+================================================================================
+Project: Super Dashboard
+Purpose: Integrated Sports Betting Analytics & Stock Monitoring Platform
+
+Short description:
+- Sports Betting: ระบบวิเคราะห์การเดิมพันด้วยหลักคณิตศาสตร์และสถิติ
+- Stock Monitoring: ระบบติดตามและประเมินมูลค่าหุ้นแบบ Professional
+- UI Design: Liquid Glass (Glassmorphism) Dark Theme
+
+Tech Stack (Final):
+- Frontend: Next.js 15, React 18, TypeScript, Tailwind CSS, Framer Motion
+- Charts: TradingView Lightweight Charts, Recharts, Chart.js
+- State: Redux Toolkit + RTK Query
+- Auth: NextAuth.js v5 (JWT + OAuth Google/GitHub + 2FA TOTP)
+- Backend: Go 1.21+, Gin, GORM v2, zerolog
+- Database: PostgreSQL 15+, Redis 7+
+- NLP: Sentiment Analysis for News
+- Validation: Zod (FE), go-playground/validator (BE)
+- Docs: Swagger/OpenAPI 3.0, Storybook 8
+- Testing: Jest, React Testing Library, Playwright, Go testing
+- i18n: next-intl (EN/TH)
+- Deployment: Docker Compose, Nginx, Let's Encrypt
+
+================================================================================
+FINAL SUMMARY (Counts)
+================================================================================
+- Sports Betting features: 35
+- Stock Monitoring features: 40
+- Paper Trading & Backtest: 15
+- Analytics: 15
+- User Experience: 8
+- Notifications & Automation: 10
+- Data & Backup: 4
+- Settings & Admin: 15
+- TOTAL FEATURES: 142
+- Database Tables: 30+
+- Background Workers: 11
+- API Endpoints: 80+
+- UI Components: 40+
+- WebSocket Events: 10+
+
+================================================================================
+SPORTS BETTING MODULE (30+ Features)
+================================================================================
+Module overview: data collection, probability models, value detection, odds movement analysis, staking & bankroll management, filters & analytics, team analysis.
+
+Data Collection Layer
+1. Multi-Bookmaker Odds Fetching — ดึง odds จาก Pinnacle, Bet365, 1XBet, William Hill, DraftKings, FanDuel ฯลฯ
+2. Odds Types — 1X2, Handicap, Over/Under, Opening, Live, Movement
+3. Match Stats Collection — ฟอร์ม 5-10 นัด, xG/xGA, H2H, Home/Away, Possession, Shots
+4. Team Condition Tracker — บาดเจ็บ, แบน, โรเตชัน, Fixture Congestion
+5. Weather Integration — สภาพอากาศวันแข่ง (ฝน, ลม, อุณหภูมิ)
+
+True Probability Model (5 Models Combined)
+6. Stat-based Probability — คำนวณจากสถิติจริง
+7. Poisson Distribution — ทำนายจำนวนประตู
+8. xG-based Model — ใช้ Expected Goals
+9. ELO Rating Adjusted — ปรับตาม ELO Rating
+10. Bayesian Update — ปรับความน่าจะเป็นตามข้อมูลใหม่
+11. Weighted Average Ensemble — รวมทุกโมเดลด้วย weighted average
+
+Value Bet Detection
+12. Implied Probability Calculator — แปลง odds → probability
+13. Value Calculation — true_prob - implied_prob
+14. Value Bet Threshold — Value > 5% = มี value, > 10% = โคตรคุ้ม
+15. Multi-bookmaker Arbitrage Finder — หา Sure Bet ระหว่างเจ้า
+
+Odds Movement Analysis (10 Theories)
+16. Pinnacle Market Movement — วิเคราะห์การเคลื่อนไหวราคา Pinnacle
+17. Sharp vs Square Money — แยก Professional vs Recreational
+18. Asian Handicap Movements — วิเคราะห์ AH line movement
+19. Line Movement Detection — ตรวจจับราคาขยับผิดปกติ
+20. Closing Line Value (CLV) — เปรียบเทียบราคาวาง vs ราคาปิด
+(Additional analyses up to 10 theories as required)
+
+Staking & Bankroll
+21. Kelly Criterion — bet_size = bankroll × kelly_factor × value
+22. Fractional Kelly — Full, Half, Quarter Kelly
+23. Daily Risk Limit — จำกัด bets/วัน, stake/คู่
+24. Bankroll Tracking — กราฟรายวัน, ROI, Win Rate, Variance
+
+Bet Filtering & Analytics
+25. League Filter — เลือกเฉพาะลีกใหญ่ที่มีสถิติครบ
+26. Risk Filter — หลีกเลี่ยงลีกผี, บอลอุ่นเครื่อง, ทีมมีปัญหา
+27. Bet History Analytics — ลีกไหนชนะบ่อย, ประเภท bet ไหนดี
+28. ROI by League/Team/Type — แยก ROI ตาม dimension
+29. Streak Tracker — Winning/Losing streak
+30. Variance Calculator — Expected vs Actual variance
+
+Team Analysis (เหมือนวิเคราะห์บริษัท)
+31. Team Financial Sheet — Goals For = Revenue, Goals Against = Expense, Points = Profit
+32. Performance Graph — กราฟ 10 นัดเทียบค่าเฉลี่ยลีก
+33. Player Impact Score — คำนวณ impact เมื่อนักเตะสำคัญเจ็บ
+34. Head-to-Head History — ประวัติเจอกัน 10 นัด
+35. Tipster Tracking — ติดตาม performance แหล่งข้อมูล
+
+================================================================================
+STOCK MONITORING MODULE (40+ Features)
+================================================================================
+Core features and valuation, technicals, comparative analysis, fundamentals, news & nlps.
+
+Core Features:
+1. Watchlist Manager — หลาย lists (Growth/Dividend/Short/Speculative)
+2. Multi-Alert System — ราคา, Volume, ข่าว, งบ, XD
+3. Real-time Price Tracking — ราคาหุ้นแบบ real-time
+4. Stock Quote Detail — Open, High, Low, Close, Volume, P/E, EPS, 52W Range
+5. Portfolio Tracker — P&L, ต้นทุนเฉลี่ย, % กำไร/ขาดทุน Real-time
+
+Fair Price Calculation (5 Models):
+6. DCF Valuation — Discounted Cash Flow + WACC + Terminal Value
+7. P/E Valuation — fair_price = EPS × fair_PE
+8. P/BV Valuation — สำหรับธนาคาร/อสังหา
+9. Graham Formula — √(22.5 × EPS × Book Value)
+10. Buffett Intrinsic Value — Owner Earnings based
+11. Margin of Safety Calculator — คำนวณ upside/downside
+
+Technical Analysis (Indicators):
+12. RSI — Overbought/Oversold
+13. MACD — Trend + Signal
+14. Bollinger Bands — Volatility bands
+15. Moving Averages — MA20/50/200 + Golden/Death Cross
+16. Fibonacci Retracement — Support/Resistance levels
+17. Volume Profile — Volume by price level
+18. Volume Spike Detection — Unusual volume alert
+19. Breakout/Breakdown Detection — Pattern recognition
+20. Divergence Detection — Price vs Indicator divergence
+
+Comparative Analysis:
+21. Stock Comparison — เปรียบเทียบ 2-5 หุ้นใน chart เดียว
+22. Competitor Matrix — P/E, P/BV, Dividend Yield, Margin, D/E vs Industry & Top 3
+23. Relative Strength vs Index — เปรียบเทียบกับ SET/S&P500
+24. Sector Heatmap (Treemap) — Market Cap weighted, เขียว/แดง
+25. Correlation Matrix — ความสัมพันธ์สินทรัพย์ในพอร์ต
+
+Visual Financial Statements:
+26. Revenue vs Net Income Chart — กราฟแท่ง 5 ปี (Q/Y)
+27. Margin Squeeze Alert — ยอดขายโต แต่กำไรลด
+28. DuPont Analysis Visualization — ROE = Margin × Turnover × Leverage
+
+Fundamental Data:
+29. Earnings Calendar — ปฏิทินประกาศงบ + Surprise History
+30. Dividend Tracker — Ex-date, Yield, Payout Ratio
+31. Insider Trading Monitor — CEO, Directors transactions
+32. Institutional Holdings — Fund ใหญ่ๆ ถืออะไรบ้าง
+33. Analyst Ratings Aggregator — Buy/Hold/Sell จากหลาย broker
+
+News & Sentiment:
+34. Multi-source News Aggregation — Bloomberg, Reuters, CNBC, Thai sources
+35. NLP Sentiment Analysis — Positive/Negative/Neutral
+36. Event Type Classification — เปิดตัวสินค้า, คดีความ, CEO ลาออก, เพิ่มทุน
+
+Stock Screener:
+37. Custom Criteria Filter — P/E < 10, Dividend > 5%, etc.
+38. Pre-built Screens — Value, Growth, Dividend, Momentum
+
+Macro View:
+39. Economic Calendar — GDP, CPI, Fed Meeting, BOT Meeting
+40. Currency & Commodities — USD/THB, Gold, Oil
+
+================================================================================
+PAPER TRADING & BACKTESTING MODULE (15 Features)
+================================================================================
+Paper Trading:
+1. Virtual Portfolio — $100,000 starting capital
+2. Buy/Sell Simulation — Market orders
+3. Limit Orders — ตั้ง order ล่วงหน้า
+4. Stop Loss & Take Profit — Auto sell เมื่อถึงราคา
+5. Position Sizing Calculator — คำนวณ size ตาม risk %
+6. Trade Journal — บันทึก reasoning + lessons
+7. Performance Tracking — P&L, Win Rate, ROI
+8. Performance Attribution — วิเคราะห์ที่มาของ P&L
+9. Benchmark Comparison — เทียบกับ S&P 500
+10. Leaderboard — อันดับ paper traders
+
+Backtesting Engine:
+11. Stock Strategy Backtest — "ถ้าใช้ Graham 3 ปีก่อน กำไรเท่าไหร่?"
+12. Betting Strategy Backtest — "ถ้ารอง Value > 5% ฤดูกาลที่แล้ว?"
+13. Parameter Optimization — ปรับจูน Kelly_factor, Fair_PE
+14. Backtest Metrics — Win Rate, Max Drawdown, Sharpe Ratio
+15. Auto Bet Rules (Paper) — ตั้งกฎ auto bet เมื่อเจอ value
+
+================================================================================
+ANALYTICS MODULE (15 Features)
+================================================================================
+1. Dashboard Overview — Stats Cards + Charts
+2. Performance Charts — Line, Bar, Area
+3. Custom Date Range — เลือก range เอง
+4. Comparison Mode — เปรียบเทียบ 2 ช่วงเวลา
+5. Goal Tracking — ตั้งเป้า + track progress
+6. Drawdown Analysis — Max drawdown + recovery time
+7. Sharpe Ratio — Risk-adjusted returns
+8. Kelly Growth Simulation — จำลอง bankroll growth
+9. Monte Carlo Simulation — Risk scenarios
+10. Market/League Breakdown — แยกตาม segment
+11. ROI Heatmap — Calendar heatmap
+12. Win Rate Trends — Over time
+13. Betting P&L by Hour — Best time to bet
+14. Stock Sector Performance — By sector
+15. Export Reports (PDF/Excel) — รายงานสรุป
+
+================================================================================
+USER EXPERIENCE MODULE (8 Features)
+================================================================================
+1. Keyboard Shortcuts — Ctrl+K = Search, B = Betting
+2. Command Palette — พิมพ์คำสั่งแบบ VS Code
+3. Customizable Dashboard — ลาก-วาง widgets
+4. Favorites / Pinned — Pin items ไว้ด้านบน
+5. Recent Activity Feed — Activity ล่าสุด
+6. Quick Actions — ปุ่มลัด actions ที่ใช้บ่อย
+7. Onboarding Tour — แนะนำ new users
+8. Tips of the Day — Tips การใช้งาน
+
+================================================================================
+NOTIFICATIONS & AUTOMATION (10 Features)
+================================================================================
+1. In-app Notifications — แจ้งเตือนในระบบ
+2. Email Notifications — ส่ง email
+3. Telegram Bot — แจ้งเตือน Value Bet
+4. LINE Notification — แจ้งเตือนผ่าน LINE
+5. Discord Webhook — แจ้งเตือนผ่าน Discord
+6. Conditional Alerts — RSI < 30 AND Price < 50 DMA
+7. Scheduled Reports — ส่ง report อัตโนมัติ Weekly/Monthly
+8. Watchlist Alerts — แจ้งเตือน watchlist signals
+9. Value Bet Daily Picks — สร้างคู่แนะนำประจำวัน
+10. Price Alert Triggers — เมื่อถึง target price
+
+================================================================================
+DATA & BACKUP (4 Features)
+================================================================================
+1. Import Data — CSV/Excel import
+2. Data Sync — Sync ระหว่าง devices
+3. Backup to Cloud — Google Drive / Dropbox
+4. Data Retention Policy — ตั้งค่าเก็บข้อมูลกี่ปี
+
+================================================================================
+SETTINGS & ADMIN (15 Features)
+================================================================================
+1. Profile Settings — ข้อมูลส่วนตัว
+2. Bankroll Settings — ตั้งค่า bankroll
+3. API Keys Management — จัดการ API keys
+4. Notification Preferences — ตั้งค่าแจ้งเตือน
+5. Theme Toggle — Dark/Light/System
+6. Language (i18n) — EN/TH
+7. 2FA (TOTP) — Two-Factor Auth
+8. Audit Log — บันทึก actions สำคัญ
+9. Admin Panel — User management
+10. System Stats — API usage monitoring
+11. Manual Data Refresh — Force refresh data
+12. Kelly Factor Setting — ปรับ Kelly multiplier
+13. Risk Level Setting — Conservative/Moderate/Aggressive
+14. Default Bookmaker — เลือก bookmaker หลัก
+15. Export Settings — CSV/PDF preferences
+
+================================================================================
+INFRASTRUCTURE & BACKEND
+================================================================================
+API & Data Flow:
+- API Versioning: /api/v1/*
+- Pagination: page, per_page, meta object
+- Error Format: { success, error: { code, message, details } }
+- Rate Limiting: Auth: 5/min, API: 100/min
+
+Background Workers (Cron Jobs):
+- OddsSync: ทุก 30 นาที - 1 ชั่วโมง — ดึง odds จากทุก bookmakers
+- StockSync: ทุก 15 วินาที (market hours) — ดึงราคาหุ้น
+- MatchStatusUpdate: ทุก 1 นาที — อัพเดทสถานะแมตช์
+- NewsSync: ทุก 15 นาที — ดึงข่าวใหม่
+- SentimentAnalysis: ทุก 30 นาที — วิเคราะห์ sentiment
+- AlertChecker: ทุก 30 วินาที — เช็ค price alerts
+- ValueBetCalculator: ทุก 1 ชั่วโมง — คำนวณ value bets ใหม่
+- AnalyticsAggregation: ทุก 1 ชั่วโมง — รวม analytics data
+- DailyPicks: ทุกวัน 08:00 — สร้างคู่แนะนำประจำวัน
+- DataCleanup: ทุกวัน 03:00 — ลบข้อมูลเก่า
+- BackupJob: ทุกวัน 04:00 — Backup database
+
+WebSocket Events:
+- Sports: match:live_score, match:odds_update, match:status_change, bet:result
+- Stocks: stock:price_update, stock:alert_triggered, stock:news
+- System: notification:new, user:session_expired
+
+Caching Strategy (Redis TTL):
+- Match data: 5 minutes
+- Odds data: 1 minute
+- Stock quotes: 15 seconds
+- News: 15 minutes
+- User sessions: 24 hours
+- Static data (leagues, teams): 24 hours
+- Fair value calculations: 1 hour
+
+Health & Monitoring Endpoints:
+- GET /health — Basic health
+- GET /health/ready — Dependencies check
+- GET /health/live — Liveness probe
+- GET /metrics — Prometheus metrics
+
+Security:
+- Headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
+- Auth: JWT + OAuth + 2FA TOTP
+- Validation: Zod (FE), go-validator (BE)
+- Rate Limiting: Per endpoint limits
+- Audit Log: Login, Bets, Settings changes
+
+================================================================================
+DATABASE TABLES (30+)
+================================================================================
+-- Users & Auth: users, sessions, oauth_accounts, two_factor_auth, audit_logs
+
+-- Sports Betting: teams, leagues, matches, odds, odds_history, bets, bankroll_history, tipsters, tipster_tips, head_to_head, injuries, weather_data
+
+-- Stocks: stocks, stock_prices, stock_news, stock_sentiment, watchlists, watchlist_items, earnings_calendar, dividends, insider_transactions, institutional_holdings, analyst_ratings, fair_values
+
+-- Paper Trading: portfolios, paper_trades, trade_journal, limit_orders, backtest_results
+
+-- Analytics & Settings: goals, favorites, dashboard_layouts, price_alerts, notifications, scheduled_reports, settings, user_api_keys
+
+-- System: daily_picks, value_bets, arbitrage_opportunities
+
+================================================================================
+UI PAGES & TABS
+================================================================================
+Main Pages:
+- Dashboard: Overview, Recent Activity, Value Bets, Watchlist Preview
+- Betting: Matches, Value Bets, Bet Slip, History, Arbitrage, Daily Picks
+- Stocks: Market Overview, Watchlist, Screener, Comparison, Heatmap
+- Stock Detail: Quote, Chart, Technicals, Fundamentals, News, Valuation
+- Paper Trading: Portfolio, Trade, Orders, Journal, Backtest, Leaderboard
+- Analytics: Betting Stats, Stock Stats, Goals, Reports
+- Settings: Profile, Bankroll, API Keys, Notifications, Security, Admin
+
+Simulation Tab:
+- Paper Trading Toggle: เปิด/ปิด Demo Mode
+- Backtest Runner: เลือก strategy + date range + run
+- Results Dashboard: Win Rate, Drawdown, Sharpe, Equity Curve
+
+Comparison Tab:
+- Search: ค้นหาหุ้น/ทีมเพื่อ plot เปรียบเทียบ
+- Multi-line Chart: 2-5 items ใน chart เดียว
+- Metrics Table: เปรียบเทียบ key metrics
+
+Financial Health Tab:
+- Revenue vs Income Chart: กราฟแท่ง 5 ปี
+- DuPont Analysis: ROE breakdown
+- xG History: สำหรับทีมฟุตบอล
+
+================================================================================
+UI & UX SUMMARY
+================================================================================
+- TOTAL UI Components: 40+ (GlassCard, GlassButton, GlassInput, Modal, Table, Charts, Sidebar, Header, CommandPalette, etc.)
+- Keyboard Shortcuts, Command Palette, Customizable Dashboard, Favorites/Pinned, Recent Activity, Quick Actions, Onboarding Tour, Tips of the Day
+
+================================================================================
+DEPLOYMENT & RUNBOOK (QUICK)
+================================================================================
+- docker-compose with services: backend, postgres, redis, (frontend optional)
+- Nginx + Let's Encrypt for TLS in production
+- Makefile targets: build, run, docker-up, docker-down, test, migrate-up
