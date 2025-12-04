@@ -63,6 +63,9 @@ func (r *InMemoryPortfolioRepository) Update(portfolio *model.Portfolio) error {
 func (r *InMemoryPortfolioRepository) Delete(id uuid.UUID) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	if _, ok := r.portfolios[id]; !ok {
+		return gorm.ErrRecordNotFound
+	}
 	delete(r.portfolios, id)
 	return nil
 }
@@ -142,6 +145,9 @@ func (r *InMemoryPositionRepository) Update(position *model.Position) error {
 func (r *InMemoryPositionRepository) Delete(id uuid.UUID) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	if _, ok := r.positions[id]; !ok {
+		return gorm.ErrRecordNotFound
+	}
 	delete(r.positions, id)
 	return nil
 }
@@ -200,6 +206,9 @@ func (r *InMemoryOrderRepository) Update(order *model.Order) error {
 func (r *InMemoryOrderRepository) Delete(id uuid.UUID) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
+	if _, ok := r.orders[id]; !ok {
+		return gorm.ErrRecordNotFound
+	}
 	delete(r.orders, id)
 	return nil
 }
