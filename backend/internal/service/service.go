@@ -12,6 +12,12 @@ import (
 	"github.com/superdashboard/backend/internal/repository"
 )
 
+// Token duration constants.
+const (
+	AccessTokenDuration  = 15 * time.Minute
+	RefreshTokenDuration = 7 * 24 * time.Hour
+)
+
 var (
 	// ErrInvalidCredentials is returned when login credentials are invalid.
 	ErrInvalidCredentials = errors.New("invalid email or password")
@@ -45,7 +51,7 @@ func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthSe
 
 // Register creates a new user account.
 func (s *authService) Register(email, password, name string) (*model.User, error) {
-	// Check if user already exists
+	// Check if user already exists - we only care if the user exists, not the error type
 	existing, _ := s.userRepo.GetByEmail(email)
 	if existing != nil {
 		return nil, ErrUserAlreadyExists
@@ -86,14 +92,14 @@ func (s *authService) Login(email, password string) (string, string, error) {
 		return "", "", ErrInvalidCredentials
 	}
 
-	// Generate access token (expires in 15 minutes)
-	accessToken, err := s.generateToken(user.ID, user.Email, user.Role, 15*time.Minute)
+	// Generate access token
+	accessToken, err := s.generateToken(user.ID, user.Email, user.Role, AccessTokenDuration)
 	if err != nil {
 		return "", "", err
 	}
 
-	// Generate refresh token (expires in 7 days)
-	refreshToken, err := s.generateToken(user.ID, user.Email, user.Role, 7*24*time.Hour)
+	// Generate refresh token
+	refreshToken, err := s.generateToken(user.ID, user.Email, user.Role, RefreshTokenDuration)
 	if err != nil {
 		return "", "", err
 	}
@@ -128,7 +134,7 @@ func (s *authService) RefreshToken(refreshToken string) (string, error) {
 	}
 
 	// Generate new access token
-	return s.generateToken(userID, email, role, 15*time.Minute)
+	return s.generateToken(userID, email, role, AccessTokenDuration)
 }
 
 // ValidateToken validates a JWT token and returns its claims.

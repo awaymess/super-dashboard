@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/rs/zerolog/log"
@@ -51,7 +50,7 @@ func Load() (*Config, error) {
 		var configFileNotFoundError viper.ConfigFileNotFoundError
 		if errors.As(err, &configFileNotFoundError) {
 			log.Debug().Msg("No .env file found, using environment variables and defaults")
-		} else if !os.IsNotExist(err) {
+		} else {
 			log.Warn().Err(err).Msg("Error reading config file")
 		}
 	}

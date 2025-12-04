@@ -7,6 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/superdashboard/backend/internal/config"
+	"github.com/superdashboard/backend/internal/handler"
+	"github.com/superdashboard/backend/internal/repository"
+	"github.com/superdashboard/backend/internal/service"
+	"github.com/superdashboard/backend/pkg/database"
 	"github.com/superdashboard/backend/pkg/logger"
 )
 
@@ -41,7 +45,7 @@ func main() {
 		})
 	})
 
-	// API v1 routes placeholder
+	// API v1 routes
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/", func(c *gin.Context) {
@@ -50,6 +54,35 @@ func main() {
 				"version": "1.0.0",
 			})
 		})
+	}
+
+	// Initialize database and services only if not using mock data
+	if !cfg.UseMockData && cfg.DatabaseURL != "" {
+		db, err := database.Connect(cfg.DatabaseURL)
+		if err != nil {
+			log.Fatal().Err(err).Msg("Failed to connect to database")
+		}
+
+		// Run migrations
+		if err := database.AutoMigrate(db); err != nil {
+			log.Fatal().Err(err).Msg("Failed to run database migrations")
+		}
+
+		// Initialize repositories
+		userRepo := repository.NewUserRepository(db)
+
+		// Initialize services
+		authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+
+		// Initialize handlers
+		authHandler := handler.NewAuthHandler(authService)
+
+		// Register routes
+		authHandler.RegisterAuthRoutes(v1)
+
+		log.Info().Msg("Database-backed services initialized")
+	} else {
+		log.Info().Msg("Running with mock data mode - auth endpoints not available")
 	}
 
 	// Start server
