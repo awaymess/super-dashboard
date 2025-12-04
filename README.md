@@ -95,30 +95,38 @@ super-dashboard/
 
 ### Prerequisites
 - Node.js 18+
-- Go 1.21+
+- Go 1.23+
 - Docker & Docker Compose
 
 ### Installation
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/super-dashboard.git
+git clone https://github.com/awaymess/super-dashboard.git
 cd super-dashboard
 ```
 
-2. Install dependencies
+2. Set up environment (optional - defaults work for mock mode)
+```bash
+cp backend/.env.example backend/.env
+# Edit backend/.env to configure your settings
+```
+
+3. Install dependencies
 ```bash
 make install
 ```
 
-3. Start the development environment
+4. Start the development environment
 ```bash
 make dev
 ```
 
-4. Open your browser
+5. Open your browser
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8080
+
+For detailed local development instructions, see [docs/run-locally.md](docs/run-locally.md).
 
 ## 📋 Available Commands
 
@@ -126,11 +134,13 @@ make dev
 ```bash
 make install      # Install all dependencies
 make dev          # Start development servers
+make run          # Run backend server only
 make build        # Build for production
 make test         # Run all tests
 make clean        # Clean build artifacts
 make docker-up    # Start Docker services
 make docker-down  # Stop Docker services
+make migrate-up   # Run database migrations
 ```
 
 ### Frontend

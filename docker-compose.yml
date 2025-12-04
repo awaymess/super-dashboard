@@ -1,5 +1,25 @@
 version: '3.8'
 
+# Super Dashboard Docker Compose Configuration
+# 
+# Environment Variables:
+#   - ENV: Application environment (development/production)
+#   - PORT: Server port (default: 8080)
+#   - USE_MOCK_DATA: Enable mock data mode (default: true)
+#   - DATABASE_URL: PostgreSQL connection string
+#   - REDIS_URL: Redis connection string
+#   - JWT_SECRET: JWT signing secret (CHANGE IN PRODUCTION!)
+#   - OPENAI_API_KEY: OpenAI API key for NLP features (optional)
+#   - VECTOR_DB_DSN: Vector database DSN for embeddings (optional)
+#
+# Usage:
+#   docker-compose up -d        # Start all services
+#   docker-compose down         # Stop all services
+#   docker-compose logs -f      # View logs
+#
+# Note: When USE_MOCK_DATA=true, the backend will use mock repositories
+# and health checks will return "degraded" status if DB/Redis are unavailable.
+
 services:
   backend:
     build:
@@ -9,13 +29,21 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # Application settings
       - ENV=development
       - PORT=8080
+      # Mock data mode - set to false to use real database
       - USE_MOCK_DATA=true
+      # Database connection
       - DATABASE_URL=postgres://superdash:superdash123@postgres:5432/superdashboard?sslmode=disable
+      # Redis connection
       - REDIS_URL=redis://redis:6379
       # SECURITY: Change this secret in production! Use a strong random value.
       - JWT_SECRET=${JWT_SECRET:-CHANGE_ME_IN_PRODUCTION_use_strong_random_secret}
+      # OpenAI API key for NLP features (optional, leave empty if not using)
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      # Vector database DSN for embeddings (optional, uses same as DATABASE_URL by default)
+      - VECTOR_DB_DSN=${VECTOR_DB_DSN:-postgres://superdash:superdash123@postgres:5432/superdashboard?sslmode=disable}
     depends_on:
       postgres:
         condition: service_healthy
