@@ -116,7 +116,7 @@ See `backend/.env.example` for all available configuration options:
 
 When `USE_MOCK_DATA=true` (default), the backend:
 - Uses in-memory mock repositories instead of database
-- Health readiness returns "degraded" if DB/Redis are unavailable but doesn't fail
+- Health readiness returns "ready" status (no DB/Redis health checkers are registered in mock mode)
 - All API endpoints return sample data
 
 This is useful for:

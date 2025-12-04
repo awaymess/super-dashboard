@@ -18,7 +18,7 @@ version: '3.8'
 #   docker-compose logs -f      # View logs
 #
 # Note: When USE_MOCK_DATA=true, the backend will use mock repositories
-# and health checks will return "degraded" status if DB/Redis are unavailable.
+# and health checks will return "ready" status (no DB/Redis checks are performed).
 
 services:
   backend:
