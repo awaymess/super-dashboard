@@ -12,6 +12,7 @@ import (
 	"github.com/superdashboard/backend/internal/service"
 	"github.com/superdashboard/backend/pkg/database"
 	"github.com/superdashboard/backend/pkg/logger"
+	"github.com/superdashboard/backend/pkg/nlp"
 )
 
 func main() {
@@ -95,6 +96,14 @@ func main() {
 		paperTradingHandler := handler.NewPaperTradingHandler()
 		paperTradingHandler.RegisterPaperTradingRoutes(v1)
 		log.Info().Msg("Paper trading endpoints registered")
+
+		// Initialize NLP handler (mock mode)
+		nlpProvider := nlp.NewMockProvider()
+		articleRepo := repository.NewInMemoryArticleRepository()
+		nlpService := service.NewNLPService(nlpProvider, articleRepo)
+		nlpHandler := handler.NewNLPHandler(nlpService)
+		nlpHandler.RegisterNLPRoutes(v1)
+		log.Info().Msg("NLP endpoints registered")
 
 		log.Info().Msg("Running with mock data mode")
 	} else if cfg.DatabaseURL != "" {
