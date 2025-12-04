@@ -49,7 +49,7 @@ func parseBoolEnv(value string, defaultVal bool) bool {
 		return defaultVal
 	}
 	switch strings.ToLower(strings.TrimSpace(value)) {
-	case "false", "0", "no", "off", "":
+	case "false", "0", "no", "off":
 		return false
 	case "true", "1", "yes", "on":
 		return true
