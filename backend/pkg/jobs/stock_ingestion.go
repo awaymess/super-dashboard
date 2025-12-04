@@ -91,22 +91,29 @@ func (s *StockPriceIngester) ingestMockPrices(ctx context.Context) error {
 		priceChange := 1.0 + (rand.Float64()-0.5)*0.04
 		volumeChange := 0.8 + rand.Float64()*0.4
 
+		open := basePrice.Open * priceChange
+		closePrice := basePrice.Close * priceChange
+		high := basePrice.High * priceChange * (1 + rand.Float64()*0.01)
+		low := basePrice.Low * priceChange * (1 - rand.Float64()*0.01)
+
+		// Ensure complete OHLC validity: High >= max(Open, Close) and Low <= min(Open, Close)
+		maxOC := max(open, closePrice)
+		minOC := min(open, closePrice)
+		if high < maxOC {
+			high = maxOC * 1.005
+		}
+		if low > minOC {
+			low = minOC * 0.995
+		}
+
 		newPrice := model.StockPrice{
 			ID:        uuid.New(),
 			Timestamp: time.Now(),
-			Open:      basePrice.Open * priceChange,
-			High:      basePrice.High * priceChange * (1 + rand.Float64()*0.01),
-			Low:       basePrice.Low * priceChange * (1 - rand.Float64()*0.01),
-			Close:     basePrice.Close * priceChange,
+			Open:      open,
+			High:      high,
+			Low:       low,
+			Close:     closePrice,
 			Volume:    int64(float64(basePrice.Volume) * volumeChange),
-		}
-
-		// Ensure High >= Close >= Open >= Low relationship makes sense
-		if newPrice.High < newPrice.Close {
-			newPrice.High = newPrice.Close * 1.005
-		}
-		if newPrice.Low > newPrice.Close {
-			newPrice.Low = newPrice.Close * 0.995
 		}
 
 		// Add to history (keep last 100 entries)
