@@ -12,12 +12,13 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/awaymess/super-dashboard/backend/internal/config"
-	"github.com/awaymess/super-dashboard/backend/internal/handler"
-	"github.com/awaymess/super-dashboard/backend/internal/repository"
-	"github.com/awaymess/super-dashboard/backend/internal/service"
-	"github.com/awaymess/super-dashboard/backend/pkg/database"
-	"github.com/awaymess/super-dashboard/backend/pkg/logger"
+	"github.com/superdashboard/backend/internal/config"
+	"github.com/superdashboard/backend/internal/handler"
+	"github.com/superdashboard/backend/internal/repository"
+	"github.com/superdashboard/backend/internal/service"
+	"github.com/superdashboard/backend/pkg/database"
+	"github.com/superdashboard/backend/pkg/logger"
+	"github.com/superdashboard/backend/pkg/redis"
 )
 
 func main() {
@@ -130,8 +131,27 @@ func main() {
 		// Initialize repositories
 		userRepo := repository.NewUserRepository(db)
 
+		// Initialize Redis for token storage (optional)
+		var tokenStore service.TokenStore
+		if cfg.RedisURL != "" {
+			redisClient, err := redis.Connect(cfg.RedisURL)
+			if err != nil {
+				log.Warn().Err(err).Msg("Failed to connect to Redis, continuing without token persistence")
+			} else {
+				tokenStore = redisClient
+				// Add Redis health checker
+				healthHandler.AddHealthChecker(func() (string, bool, string) {
+					if err := redisClient.Ping(context.Background()); err != nil {
+						return "redis", false, err.Error()
+					}
+					return "redis", true, "connected"
+				})
+				log.Info().Msg("Connected to Redis for token storage")
+			}
+		}
+
 		// Initialize services
-		authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+		authService := service.NewAuthService(userRepo, cfg.JWTSecret, tokenStore)
 
 		// Initialize handlers
 		authHandler := handler.NewAuthHandler(authService)
