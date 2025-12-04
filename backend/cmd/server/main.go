@@ -1,5 +1,12 @@
 package main
 
+// @title Super Dashboard API
+// @version 1.0
+// @description Integrated Sports Betting & Stock Monitoring API
+// @schemes http
+// @host localhost:8080
+// @BasePath /
+
 import (
 	"context"
 	"net/http"

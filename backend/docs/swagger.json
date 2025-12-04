@@ -1,0 +1,2406 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "Integrated Sports Betting \u0026 Stock Monitoring API",
+        "title": "Super Dashboard API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "description": "Authenticate user and return tokens",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Login user",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "description": "Generate a new access token using a refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Refresh access token",
+                "parameters": [
+                    {
+                        "description": "Refresh token",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.RefreshRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RefreshResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "description": "Create a new user account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "Registration details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RegisterResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/bets": {
+            "get": {
+                "description": "Get user's betting history",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Get bet history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Filter by status",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Place a new bet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Place a bet",
+                "parameters": [
+                    {
+                        "description": "Bet details",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.BetRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/matches": {
+            "get": {
+                "description": "Get a list of all matches",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "List all matches",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Match"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/matches/{id}": {
+            "get": {
+                "description": "Get details of a specific match",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Get match by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Match"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/matches/{id}/odds": {
+            "get": {
+                "description": "Get betting odds for a specific match",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Get match odds",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Match ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Odds"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/stats": {
+            "get": {
+                "description": "Get user's betting statistics",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Get betting statistics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.BettingStatsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/betting/value-bets": {
+            "get": {
+                "description": "Get a list of current value bets",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "betting"
+                ],
+                "summary": "Get value bets",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.ValueBetResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/nlp/ingest": {
+            "post": {
+                "description": "Ingest a news article, generate embeddings, and analyze sentiment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nlp"
+                ],
+                "summary": "Ingest a news article",
+                "parameters": [
+                    {
+                        "description": "Article to ingest",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.IngestRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.IngestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/nlp/search": {
+            "get": {
+                "description": "Search for articles using semantic similarity",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "nlp"
+                ],
+                "summary": "Semantic search for articles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Maximum number of results",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.SearchResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/backtest": {
+            "post": {
+                "description": "Run a backtest with specified strategy",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Run backtest",
+                "parameters": [
+                    {
+                        "description": "Backtest configuration",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.BacktestRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.BacktestResultResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/journal": {
+            "get": {
+                "description": "Get paper trading journal entries",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Get journal entries",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new trade journal entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Create journal entry",
+                "parameters": [
+                    {
+                        "description": "Journal entry",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.JournalEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/leaderboard": {
+            "get": {
+                "description": "Get paper trading leaderboard",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Get leaderboard",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Period filter (daily, weekly, monthly, all)",
+                        "name": "period",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.LeaderboardEntryResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/portfolio": {
+            "get": {
+                "description": "Get user's paper trading portfolio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Get portfolio",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.PortfolioResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/positions": {
+            "get": {
+                "description": "Get all positions in the portfolio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Get positions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.PositionResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/reset": {
+            "post": {
+                "description": "Reset paper trading portfolio",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Reset portfolio",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.PortfolioResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/trade": {
+            "post": {
+                "description": "Execute a paper trading order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Execute trade",
+                "parameters": [
+                    {
+                        "description": "Trade order",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.TradeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.TransactionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper-trading/transactions": {
+            "get": {
+                "description": "Get paper trading transaction history",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper-trading"
+                ],
+                "summary": "Get transactions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.TransactionResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/orders": {
+            "get": {
+                "description": "List all orders for a portfolio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "List orders",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "portfolio_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.OrderResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new paper trading order with simulated fill",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Create paper order",
+                "parameters": [
+                    {
+                        "description": "Order request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.PaperOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/handler.OrderResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable Entity",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/orders/{id}": {
+            "get": {
+                "description": "Get a paper trading order by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Get order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.OrderResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/portfolios": {
+            "get": {
+                "description": "List all paper trading portfolios",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "List portfolios",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Portfolio"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new paper trading portfolio",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Create portfolio",
+                "parameters": [
+                    {
+                        "description": "Portfolio request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.CreatePortfolioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Portfolio"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/portfolios/{id}": {
+            "get": {
+                "description": "Get a paper trading portfolio by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Get portfolio",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Portfolio"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a paper trading portfolio",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Update portfolio",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.UpdatePortfolioRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Portfolio"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a paper trading portfolio",
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Delete portfolio",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/positions": {
+            "get": {
+                "description": "List all positions for a portfolio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "List positions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "portfolio_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Position"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/positions/{id}": {
+            "get": {
+                "description": "Get a position by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "Get position",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Position ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Position"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/paper/trades": {
+            "get": {
+                "description": "List all trades for a portfolio",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "paper"
+                ],
+                "summary": "List trades",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Portfolio ID",
+                        "name": "portfolio_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.TradeResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/stocks": {
+            "get": {
+                "description": "Get a list of all available stocks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stocks"
+                ],
+                "summary": "List all stocks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Stock"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/stocks/quotes/{symbol}": {
+            "get": {
+                "description": "Get the latest quote for a stock by symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stocks"
+                ],
+                "summary": "Get stock quote",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.StockQuoteResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/stocks/{symbol}/history": {
+            "get": {
+                "description": "Get the price history for a stock by symbol",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "stocks"
+                ],
+                "summary": "Get stock price history",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Stock symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of historical prices to return (default 30)",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.StockPriceHistoryResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Returns basic health status of the service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Basic health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health/live": {
+            "get": {
+                "description": "Checks if the service is alive (used by Kubernetes liveness probe)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Liveness check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/health/ready": {
+            "get": {
+                "description": "Checks if the service and all dependencies are ready",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Readiness check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics": {
+            "get": {
+                "description": "Returns application metrics including uptime, memory usage, and request counts",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "monitoring"
+                ],
+                "summary": "Get application metrics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.MetricsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/metrics/prometheus": {
+            "get": {
+                "description": "Returns metrics in Prometheus text format",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "monitoring"
+                ],
+                "summary": "Get Prometheus metrics",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.BacktestRequest": {
+            "type": "object",
+            "required": [
+                "end_date",
+                "initial_capital",
+                "start_date",
+                "strategy",
+                "symbol"
+            ],
+            "properties": {
+                "end_date": {
+                    "type": "string"
+                },
+                "initial_capital": {
+                    "type": "number"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "strategy": {
+                    "$ref": "#/definitions/handler.BacktestStrategy"
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.BacktestResultResponse": {
+            "type": "object",
+            "properties": {
+                "completed_at": {
+                    "type": "string"
+                },
+                "config": {
+                    "$ref": "#/definitions/handler.BacktestRequest"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "losing_trades": {
+                    "type": "integer"
+                },
+                "metrics": {
+                    "$ref": "#/definitions/handler.PerformanceMetrics"
+                },
+                "total_trades": {
+                    "type": "integer"
+                },
+                "winning_trades": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.BacktestStrategy": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "params": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "number",
+                        "format": "float64"
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "sma_crossover",
+                        "rsi",
+                        "macd",
+                        "custom"
+                    ]
+                }
+            }
+        },
+        "handler.BetRequest": {
+            "type": "object",
+            "required": [
+                "bet_type",
+                "match_id",
+                "odds",
+                "stake"
+            ],
+            "properties": {
+                "bet_type": {
+                    "type": "string"
+                },
+                "match_id": {
+                    "type": "string"
+                },
+                "odds": {
+                    "type": "number"
+                },
+                "stake": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.BettingStatsResponse": {
+            "type": "object",
+            "properties": {
+                "avg_odds": {
+                    "type": "number"
+                },
+                "avg_stake": {
+                    "type": "number"
+                },
+                "best_streak": {
+                    "type": "integer"
+                },
+                "current_streak": {
+                    "type": "integer"
+                },
+                "lost_bets": {
+                    "type": "integer"
+                },
+                "profit": {
+                    "type": "number"
+                },
+                "roi": {
+                    "type": "number"
+                },
+                "total_bets": {
+                    "type": "integer"
+                },
+                "total_returns": {
+                    "type": "number"
+                },
+                "total_staked": {
+                    "type": "number"
+                },
+                "void_bets": {
+                    "type": "integer"
+                },
+                "win_rate": {
+                    "type": "number"
+                },
+                "won_bets": {
+                    "type": "integer"
+                },
+                "worst_streak": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.CreatePortfolioRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "user_id"
+            ],
+            "properties": {
+                "initial_balance": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "object",
+                    "additionalProperties": true
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.IngestRequest": {
+            "type": "object",
+            "required": [
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "published_at": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "symbols": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.IngestResponse": {
+            "type": "object",
+            "properties": {
+                "embedding_created": {
+                    "type": "boolean"
+                },
+                "event_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "sentiment": {
+                    "$ref": "#/definitions/handler.SentimentOutput"
+                }
+            }
+        },
+        "handler.JournalEntryRequest": {
+            "type": "object",
+            "required": [
+                "reasoning",
+                "symbol",
+                "type"
+            ],
+            "properties": {
+                "emotions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "lessons": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "integer",
+                    "maximum": 5,
+                    "minimum": 1
+                },
+                "reasoning": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "transaction_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.LeaderboardEntryResponse": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "badge": {
+                    "type": "string"
+                },
+                "rank": {
+                    "type": "integer"
+                },
+                "sharpe_ratio": {
+                    "type": "number"
+                },
+                "total_return": {
+                    "type": "number"
+                },
+                "total_return_percent": {
+                    "type": "number"
+                },
+                "total_trades": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "win_rate": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.MemoryMetrics": {
+            "type": "object",
+            "properties": {
+                "alloc_bytes": {
+                    "type": "integer"
+                },
+                "num_gc": {
+                    "type": "integer"
+                },
+                "sys_bytes": {
+                    "type": "integer"
+                },
+                "total_alloc_bytes": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.MetricsResponse": {
+            "type": "object",
+            "properties": {
+                "errors_total": {
+                    "type": "integer"
+                },
+                "goroutines": {
+                    "type": "integer"
+                },
+                "memory": {
+                    "$ref": "#/definitions/handler.MemoryMetrics"
+                },
+                "requests_total": {
+                    "type": "integer"
+                },
+                "uptime": {
+                    "type": "string"
+                },
+                "uptime_seconds": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.OrderResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "filled_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_type": {
+                    "type": "string"
+                },
+                "portfolio_id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "side": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.PaperOrderRequest": {
+            "type": "object",
+            "required": [
+                "order_type",
+                "portfolio_id",
+                "quantity",
+                "side",
+                "symbol"
+            ],
+            "properties": {
+                "order_type": {
+                    "type": "string",
+                    "enum": [
+                        "market",
+                        "limit"
+                    ]
+                },
+                "portfolio_id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "side": {
+                    "type": "string",
+                    "enum": [
+                        "buy",
+                        "sell"
+                    ]
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.PerformanceMetrics": {
+            "type": "object",
+            "properties": {
+                "day_return": {
+                    "type": "number"
+                },
+                "day_return_percent": {
+                    "type": "number"
+                },
+                "max_drawdown": {
+                    "type": "number"
+                },
+                "month_return": {
+                    "type": "number"
+                },
+                "month_return_percent": {
+                    "type": "number"
+                },
+                "sharpe_ratio": {
+                    "type": "number"
+                },
+                "total_return": {
+                    "type": "number"
+                },
+                "total_return_percent": {
+                    "type": "number"
+                },
+                "week_return": {
+                    "type": "number"
+                },
+                "week_return_percent": {
+                    "type": "number"
+                },
+                "win_rate": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.PortfolioResponse": {
+            "type": "object",
+            "properties": {
+                "cash_balance": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "current_balance": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "initial_balance": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "performance": {
+                    "$ref": "#/definitions/handler.PerformanceMetrics"
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.PositionResponse"
+                    }
+                },
+                "total_value": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.PositionResponse": {
+            "type": "object",
+            "properties": {
+                "avg_cost": {
+                    "type": "number"
+                },
+                "current_price": {
+                    "type": "number"
+                },
+                "day_change": {
+                    "type": "number"
+                },
+                "day_change_percent": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "market_value": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "opened_at": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "unrealized_pl": {
+                    "type": "number"
+                },
+                "unrealized_pl_percent": {
+                    "type": "number"
+                },
+                "weight": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.RefreshRequest": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.RefreshResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "name",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                }
+            }
+        },
+        "handler.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.SearchResponse": {
+            "type": "object",
+            "properties": {
+                "query_embedding_time_ms": {
+                    "type": "integer"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handler.SearchResultResponse"
+                    }
+                },
+                "search_time_ms": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.SearchResultResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "published_at": {
+                    "type": "string"
+                },
+                "sentiment": {
+                    "type": "string"
+                },
+                "similarity": {
+                    "type": "number"
+                },
+                "snippet": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.SentimentOutput": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.StockPriceHistoryResponse": {
+            "type": "object",
+            "properties": {
+                "prices": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.StockPrice"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.StockQuoteResponse": {
+            "type": "object",
+            "properties": {
+                "high": {
+                    "type": "number"
+                },
+                "low": {
+                    "type": "number"
+                },
+                "market_cap": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "open": {
+                    "type": "number"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "sector": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "volume": {
+                    "type": "integer"
+                }
+            }
+        },
+        "handler.TradeRequest": {
+            "type": "object",
+            "required": [
+                "order_type",
+                "quantity",
+                "symbol",
+                "type"
+            ],
+            "properties": {
+                "limit_price": {
+                    "type": "number"
+                },
+                "order_type": {
+                    "type": "string",
+                    "enum": [
+                        "market",
+                        "limit",
+                        "stop",
+                        "stop_limit"
+                    ]
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "stop_price": {
+                    "type": "number"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "buy",
+                        "sell"
+                    ]
+                }
+            }
+        },
+        "handler.TradeResponse": {
+            "type": "object",
+            "properties": {
+                "executed_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "portfolio_id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "side": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "handler.TransactionResponse": {
+            "type": "object",
+            "properties": {
+                "executed_at": {
+                    "type": "string"
+                },
+                "fees": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.UpdatePortfolioRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.ValueBetResponse": {
+            "type": "object",
+            "properties": {
+                "bet_type": {
+                    "type": "string"
+                },
+                "bookmaker_odds": {
+                    "type": "number"
+                },
+                "confidence": {
+                    "type": "integer"
+                },
+                "expected_value": {
+                    "type": "number"
+                },
+                "fair_odds": {
+                    "type": "number"
+                },
+                "kelly_stake": {
+                    "type": "number"
+                },
+                "match_id": {
+                    "type": "string"
+                },
+                "recommendation": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "number"
+                }
+            }
+        },
+        "model.Match": {
+            "type": "object",
+            "properties": {
+                "away_team": {
+                    "$ref": "#/definitions/model.Team"
+                },
+                "away_team_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "home_team": {
+                    "$ref": "#/definitions/model.Team"
+                },
+                "home_team_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "league": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "venue": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Odds": {
+            "type": "object",
+            "properties": {
+                "bookmaker": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "market": {
+                    "type": "string"
+                },
+                "match_id": {
+                    "type": "string"
+                },
+                "outcome": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Portfolio": {
+            "type": "object",
+            "properties": {
+                "cash_balance": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Position"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Position": {
+            "type": "object",
+            "properties": {
+                "avg_cost": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "current_price": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "portfolio_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Stock": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "market_cap": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sector": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.StockPrice": {
+            "type": "object",
+            "properties": {
+                "close": {
+                    "type": "number"
+                },
+                "high": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "low": {
+                    "type": "number"
+                },
+                "open": {
+                    "type": "number"
+                },
+                "stock_id": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "volume": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Team": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "elo": {
+                    "type": "number"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
