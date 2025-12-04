@@ -134,10 +134,33 @@ For detailed local development instructions, see [docs/run-locally.md](docs/run-
 ```bash
 make install      # Install all dependencies
 
+
+# Free backend port
+lsof -nP -iTCP:8080 -sTCP:LISTEN
+kill -9 <PID_FROM_OUTPUT>  # replace with the PID shown
+
+# Free Next.js ports
+lsof -nP -iTCP:3000 -sTCP:LISTEN
+kill -9 <PID_FROM_OUTPUT>
+
+# Remove Next dev lock and cache
+cd "/Users/night/Desktop/super-dashboard/frontend"
+rm -rf .next
+
+# Start Docker if needed
+open -a "Docker"
+
+# Start dev stack cleanly
+cd "/Users/night/Desktop/super-dashboard"
+make dev
+
 # Ensure environment points to default socket
 docker context use default
-# Restart Docker Desktop app
 open -a "Docker"
+cd "/Users/night/Desktop/super-dashboard"
+make docker-down
+
+osascript -e 'quit app "Docker"'
 
 make dev          # Start development servers
 make run          # Run backend server only

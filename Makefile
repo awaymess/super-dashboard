@@ -7,7 +7,7 @@ install:
 
 # Run development servers
 dev:
-	docker-compose up -d
+	docker-compose up -d postgres redis
 	@echo "Starting backend..."
 	cd backend && go run cmd/server/main.go &
 	@echo "Starting frontend..."
