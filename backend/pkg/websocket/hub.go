@@ -88,20 +88,29 @@ func (h *Hub) Run() {
 
 		case message := <-h.broadcast:
 			h.mu.RLock()
+			// Collect clients that need to be removed
+			var clientsToRemove []*Client
 			for client := range h.clients {
 				select {
 				case client.Messages <- message:
 				default:
-					// Client buffer full, remove it
-					h.mu.RUnlock()
-					h.mu.Lock()
-					close(client.Messages)
-					delete(h.clients, client)
-					h.mu.Unlock()
-					h.mu.RLock()
+					// Client buffer full, mark for removal
+					clientsToRemove = append(clientsToRemove, client)
 				}
 			}
 			h.mu.RUnlock()
+
+			// Remove clients with full buffers
+			if len(clientsToRemove) > 0 {
+				h.mu.Lock()
+				for _, client := range clientsToRemove {
+					if _, ok := h.clients[client]; ok {
+						close(client.Messages)
+						delete(h.clients, client)
+					}
+				}
+				h.mu.Unlock()
+			}
 		}
 	}
 }

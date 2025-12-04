@@ -19,7 +19,16 @@ func Factorial(n int) float64 {
 // PoissonProbability calculates the Poisson probability P(X=k) for a given lambda.
 // P(X=k) = (λ^k * e^-λ) / k!
 func PoissonProbability(lambda float64, k int) float64 {
-	if lambda <= 0 || k < 0 {
+	if k < 0 {
+		return 0
+	}
+	if lambda == 0 {
+		if k == 0 {
+			return 1 // P(X=0|λ=0) = 1
+		}
+		return 0
+	}
+	if lambda < 0 {
 		return 0
 	}
 	return math.Pow(lambda, float64(k)) * math.Exp(-lambda) / Factorial(k)

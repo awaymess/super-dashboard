@@ -17,8 +17,9 @@ func TestPoissonProbability(t *testing.T) {
 		{"lambda=2, k=1", 2, 1, 0.2707, 0.001},
 		{"lambda=2, k=2", 2, 2, 0.2707, 0.001},
 		{"lambda=2, k=3", 2, 3, 0.1804, 0.001},
-		{"lambda=0, k=0", 0, 0, 0, 0.001},      // Edge case
-		{"lambda=2, k=-1", 2, -1, 0, 0.001},    // Negative k
+		{"lambda=0, k=0", 0, 0, 1, 0.001},     // P(X=0|λ=0) = 1
+		{"lambda=0, k=1", 0, 1, 0, 0.001},     // P(X=k|λ=0) = 0 for k > 0
+		{"lambda=2, k=-1", 2, -1, 0, 0.001},   // Negative k
 	}
 
 	for _, tt := range tests {

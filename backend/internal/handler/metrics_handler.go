@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"runtime"
+	"strconv"
 	"sync/atomic"
 	"time"
 
@@ -136,59 +137,13 @@ func (h *MetricsHandler) MetricsMiddleware() gin.HandlerFunc {
 }
 
 func formatFloat(f float64) string {
-	// Format float with 2 decimal places
-	intPart := int64(f)
-	fracPart := int64((f - float64(intPart)) * 100)
-	if fracPart < 0 {
-		fracPart = -fracPart
-	}
-	return formatInt64(intPart) + "." + padLeft(formatInt64(fracPart), 2, '0')
-}
-
-func formatInt64(i int64) string {
-	if i == 0 {
-		return "0"
-	}
-	neg := i < 0
-	if neg {
-		i = -i
-	}
-	var result []byte
-	for i > 0 {
-		result = append([]byte{byte('0' + i%10)}, result...)
-		i /= 10
-	}
-	if neg {
-		result = append([]byte{'-'}, result...)
-	}
-	return string(result)
-}
-
-func padLeft(s string, length int, pad byte) string {
-	for len(s) < length {
-		s = string(pad) + s
-	}
-	return s
+	return strconv.FormatFloat(f, 'f', 2, 64)
 }
 
 func formatUint64(u uint64) string {
-	if u == 0 {
-		return "0"
-	}
-	var result []byte
-	for u > 0 {
-		result = append([]byte{byte('0' + u%10)}, result...)
-		u /= 10
-	}
-	return string(result)
+	return strconv.FormatUint(u, 10)
 }
 
 func formatInt(i int) string {
-	if i == 0 {
-		return "0"
-	}
-	if i < 0 {
-		return "-" + formatUint64(uint64(-i))
-	}
-	return formatUint64(uint64(i))
+	return strconv.Itoa(i)
 }
