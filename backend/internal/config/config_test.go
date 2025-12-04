@@ -23,19 +23,19 @@ func TestLoad(t *testing.T) {
 
 func TestLoadWithEnvVars(t *testing.T) {
 	// Set environment variables
-	os.Setenv("ENV", "test")
-	os.Setenv("PORT", "9090")
-	os.Setenv("USE_MOCK_DATA", "false")
-	os.Setenv("DATABASE_URL", "postgres://test:test@localhost:5432/testdb")
-	os.Setenv("REDIS_URL", "redis://localhost:6380")
-	os.Setenv("JWT_SECRET", "test-secret")
+	if err := os.Setenv("ENV", "test"); err != nil { t.Fatalf("Setenv ENV error: %v", err) }
+	if err := os.Setenv("PORT", "9090"); err != nil { t.Fatalf("Setenv PORT error: %v", err) }
+	if err := os.Setenv("USE_MOCK_DATA", "false"); err != nil { t.Fatalf("Setenv USE_MOCK_DATA error: %v", err) }
+	if err := os.Setenv("DATABASE_URL", "postgres://test:test@localhost:5432/testdb"); err != nil { t.Fatalf("Setenv DATABASE_URL error: %v", err) }
+	if err := os.Setenv("REDIS_URL", "redis://localhost:6380"); err != nil { t.Fatalf("Setenv REDIS_URL error: %v", err) }
+	if err := os.Setenv("JWT_SECRET", "test-secret"); err != nil { t.Fatalf("Setenv JWT_SECRET error: %v", err) }
 	defer func() {
-		os.Unsetenv("ENV")
-		os.Unsetenv("PORT")
-		os.Unsetenv("USE_MOCK_DATA")
-		os.Unsetenv("DATABASE_URL")
-		os.Unsetenv("REDIS_URL")
-		os.Unsetenv("JWT_SECRET")
+		if err := os.Unsetenv("ENV"); err != nil { t.Fatalf("Unsetenv ENV error: %v", err) }
+		if err := os.Unsetenv("PORT"); err != nil { t.Fatalf("Unsetenv PORT error: %v", err) }
+		if err := os.Unsetenv("USE_MOCK_DATA"); err != nil { t.Fatalf("Unsetenv USE_MOCK_DATA error: %v", err) }
+		if err := os.Unsetenv("DATABASE_URL"); err != nil { t.Fatalf("Unsetenv DATABASE_URL error: %v", err) }
+		if err := os.Unsetenv("REDIS_URL"); err != nil { t.Fatalf("Unsetenv REDIS_URL error: %v", err) }
+		if err := os.Unsetenv("JWT_SECRET"); err != nil { t.Fatalf("Unsetenv JWT_SECRET error: %v", err) }
 	}()
 
 	cfg, err := Load()
@@ -70,9 +70,9 @@ func TestLoadWithEnvVars(t *testing.T) {
 
 func TestLoadDefaults(t *testing.T) {
 	// Clear relevant env vars to test defaults
-	os.Unsetenv("ENV")
-	os.Unsetenv("PORT")
-	os.Unsetenv("USE_MOCK_DATA")
+	_ = os.Unsetenv("ENV")
+	_ = os.Unsetenv("PORT")
+	_ = os.Unsetenv("USE_MOCK_DATA")
 
 	cfg, err := Load()
 	if err != nil {
@@ -145,8 +145,14 @@ func TestUseMockDataRobustParsing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			os.Setenv("USE_MOCK_DATA", tt.envValue)
-			defer os.Unsetenv("USE_MOCK_DATA")
+			if err := os.Setenv("USE_MOCK_DATA", tt.envValue); err != nil {
+				t.Fatalf("Setenv USE_MOCK_DATA error: %v", err)
+			}
+			defer func() {
+				if err := os.Unsetenv("USE_MOCK_DATA"); err != nil {
+					t.Fatalf("Unsetenv USE_MOCK_DATA error: %v", err)
+				}
+			}()
 
 			cfg, err := Load()
 			if err != nil {

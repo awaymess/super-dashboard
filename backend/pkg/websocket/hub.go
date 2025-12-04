@@ -216,7 +216,9 @@ func (c *Client) Unsubscribe(channel string) {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		c.conn.Close()
+		if err := c.conn.Close(); err != nil {
+			log.Error().Err(err).Str("client_id", c.ID).Msg("Failed to close WebSocket connection")
+		}
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	_ = c.conn.SetReadDeadline(time.Now().Add(pongWait))
@@ -265,7 +267,9 @@ func (c *Client) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.Close()
+		if err := c.conn.Close(); err != nil {
+			log.Error().Err(err).Str("client_id", c.ID).Msg("Failed to close WebSocket connection")
+		}
 	}()
 	for {
 		select {

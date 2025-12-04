@@ -50,7 +50,11 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get underlying database connection")
 	}
-	defer sqlDB.Close()
+	defer func() {
+		if err := sqlDB.Close(); err != nil {
+			log.Error().Err(err).Msg("Failed to close database connection")
+		}
+	}()
 
 	// Run migrations
 	if err := database.AutoMigrate(db); err != nil {

@@ -364,7 +364,9 @@ func TestInMemoryTradeRepository(t *testing.T) {
 			ExecutedAt:  time.Now(),
 		}
 
-		repo.Create(trade)
+		if err := repo.Create(trade); err != nil {
+																																																																																		t.Fatalf("Create() error = %v", err)
+		}
 
 		trades, err := repo.GetByOrderID(orderID)
 		if err != nil {
@@ -398,7 +400,10 @@ func TestSeedDefaultPortfolio(t *testing.T) {
 		t.Errorf("SeedDefaultPortfolio() cash_balance = %v, want 100000", portfolio.CashBalance)
 	}
 
-	positions, _ := positionRepo.GetByPortfolioID(portfolio.ID)
+	positions, err := positionRepo.GetByPortfolioID(portfolio.ID)
+	if err != nil {
+																																																																																		t.Fatalf("GetByPortfolioID() error = %v", err)
+	}
 	if len(positions) != 2 {
 		t.Errorf("SeedDefaultPortfolio() created %d positions, want 2", len(positions))
 	}

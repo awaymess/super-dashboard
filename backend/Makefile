@@ -16,6 +16,10 @@ dev:
 test:
 	go test -v ./...
 
+# Lint with golangci-lint
+lint:
+	golangci-lint run --timeout=5m
+
 # Clean build artifacts
 clean:
 	rm -rf bin/

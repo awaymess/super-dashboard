@@ -278,7 +278,11 @@ func TestWebSocketHandler_HandleWebSocket(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect to WebSocket: %v", err)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			t.Fatalf("conn.Close error: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusSwitchingProtocols {
 		t.Errorf("Expected status %d, got %d", http.StatusSwitchingProtocols, resp.StatusCode)
@@ -312,7 +316,11 @@ func TestWebSocketHandler_BroadcastToConnectedClients(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect to WebSocket: %v", err)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			t.Fatalf("conn.Close error: %v", err)
+		}
+	}()
 
 	// Wait for connection to be established
 	time.Sleep(100 * time.Millisecond)
