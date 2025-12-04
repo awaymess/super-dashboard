@@ -98,10 +98,27 @@ func main() {
 		betHandler.RegisterBetRoutes(v1)
 		log.Info().Msg("Betting endpoints registered")
 
-		// Initialize paper trading handler (mock mode)
+		// Initialize paper trading handler (mock mode - legacy endpoints)
 		paperTradingHandler := handler.NewPaperTradingHandler()
 		paperTradingHandler.RegisterPaperTradingRoutes(v1)
 		log.Info().Msg("Paper trading endpoints registered")
+
+		// Initialize paper trading with in-memory repositories (new /paper endpoints)
+		portfolioRepo := repository.NewInMemoryPortfolioRepository()
+		positionRepo := repository.NewInMemoryPositionRepository()
+		orderRepo := repository.NewInMemoryOrderRepository()
+		tradeRepo := repository.NewInMemoryTradeRepository()
+
+		// Seed default portfolio with some positions
+		if _, err := repository.SeedDefaultPortfolio(portfolioRepo, positionRepo); err != nil {
+			log.Warn().Err(err).Msg("Failed to seed default portfolio")
+		}
+
+		// Initialize paper trading service with mock price provider
+		paperService := service.NewPaperTradingService(portfolioRepo, positionRepo, orderRepo, tradeRepo, nil)
+		paperHandler := handler.NewPaperHandler(paperService)
+		paperHandler.RegisterPaperRoutes(v1)
+		log.Info().Msg("Paper trading API endpoints registered (/api/v1/paper)")
 
 		log.Info().Msg("Running with mock data mode")
 	} else if cfg.DatabaseURL != "" {
@@ -130,6 +147,10 @@ func main() {
 
 		// Initialize repositories
 		userRepo := repository.NewUserRepository(db)
+		portfolioRepo := repository.NewPortfolioRepository(db)
+		positionRepo := repository.NewPositionRepository(db)
+		orderRepo := repository.NewOrderRepository(db)
+		tradeRepo := repository.NewTradeRepository(db)
 
 		// Initialize Redis for token storage (optional)
 		var tokenStore service.TokenStore
@@ -155,9 +176,11 @@ func main() {
 
 		// Initialize handlers
 		authHandler := handler.NewAuthHandler(authService)
+		paperHandler := handler.NewPaperHandler(paperService)
 
 		// Register routes
 		authHandler.RegisterAuthRoutes(v1)
+		paperHandler.RegisterPaperRoutes(v1)
 
 		log.Info().Msg("Database-backed services initialized")
 	} else {
