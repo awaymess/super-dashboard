@@ -9,11 +9,6 @@ const meta: Meta<typeof Table> = {
     layout: 'padded',
   },
   tags: ['autodocs'],
-  argTypes: {
-    isLoading: {
-      control: 'boolean',
-    },
-  },
 };
 
 export default meta;
@@ -53,117 +48,134 @@ const sampleUsers: User[] = [
   { id: '5', name: 'Charlie Wilson', email: 'charlie@example.com', role: 'editor', status: 'active' },
 ];
 
-const stockColumns = [
-  { key: 'symbol', header: 'Symbol', sortable: true },
-  { key: 'name', header: 'Name' },
-  { 
-    key: 'price', 
-    header: 'Price', 
-    sortable: true,
-    render: (item: Stock) => `$${item.price.toFixed(2)}`,
-  },
-  { 
-    key: 'change', 
-    header: 'Change',
-    render: (item: Stock) => (
-      <span className={item.change >= 0 ? 'text-green-400' : 'text-red-400'}>
-        {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)} ({item.changePercent.toFixed(2)}%)
-      </span>
-    ),
-  },
-  { 
-    key: 'volume', 
-    header: 'Volume',
-    render: (item: Stock) => item.volume.toLocaleString(),
-  },
-];
-
-const userColumns = [
-  { key: 'name', header: 'Name', sortable: true },
-  { key: 'email', header: 'Email' },
-  { 
-    key: 'role', 
-    header: 'Role',
-    render: (item: User) => (
-      <Badge 
-        variant={item.role === 'admin' ? 'danger' : item.role === 'editor' ? 'warning' : 'default'}
-      >
-        {item.role}
-      </Badge>
-    ),
-  },
-  { 
-    key: 'status', 
-    header: 'Status',
-    render: (item: User) => (
-      <Badge 
-        variant={item.status === 'active' ? 'success' : item.status === 'pending' ? 'warning' : 'danger'}
-      >
-        {item.status}
-      </Badge>
-    ),
-  },
-];
-
 export const Default: Story = {
-  args: {
-    columns: stockColumns,
-    data: sampleStocks,
-    keyExtractor: (item: Stock) => item.id,
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol', sortable: true },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price', sortable: true, render: (item) => `$${item.price.toFixed(2)}` },
+        { 
+          key: 'change', 
+          header: 'Change',
+          render: (item) => (
+            <span className={item.change >= 0 ? 'text-green-400' : 'text-red-400'}>
+              {item.change >= 0 ? '+' : ''}{item.change.toFixed(2)} ({item.changePercent.toFixed(2)}%)
+            </span>
+          ),
+        },
+        { key: 'volume', header: 'Volume', render: (item) => item.volume.toLocaleString() },
+      ]}
+      data={sampleStocks}
+      keyExtractor={(item) => item.id}
+    />
+  ),
 };
 
 export const WithRowClick: Story = {
-  args: {
-    columns: stockColumns,
-    data: sampleStocks,
-    keyExtractor: (item: Stock) => item.id,
-    onRowClick: (item: Stock) => alert(`Clicked on ${item.symbol}`),
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol' },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price', render: (item) => `$${item.price.toFixed(2)}` },
+      ]}
+      data={sampleStocks}
+      keyExtractor={(item) => item.id}
+      onRowClick={(item) => alert(`Clicked on ${item.symbol}`)}
+    />
+  ),
 };
 
 export const Loading: Story = {
-  args: {
-    columns: stockColumns,
-    data: [],
-    keyExtractor: (item: Stock) => item.id,
-    isLoading: true,
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol' },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price' },
+      ]}
+      data={[]}
+      keyExtractor={(item) => item.id}
+      isLoading={true}
+    />
+  ),
 };
 
 export const Empty: Story = {
-  args: {
-    columns: stockColumns,
-    data: [],
-    keyExtractor: (item: Stock) => item.id,
-    emptyMessage: 'No stocks found. Try adjusting your filters.',
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol' },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price' },
+      ]}
+      data={[]}
+      keyExtractor={(item) => item.id}
+      emptyMessage="No stocks found. Try adjusting your filters."
+    />
+  ),
 };
 
 export const WithBadges: Story = {
-  args: {
-    columns: userColumns,
-    data: sampleUsers,
-    keyExtractor: (item: User) => item.id,
-  },
+  render: () => (
+    <Table<User>
+      columns={[
+        { key: 'name', header: 'Name', sortable: true },
+        { key: 'email', header: 'Email' },
+        { 
+          key: 'role', 
+          header: 'Role',
+          render: (item) => (
+            <Badge variant={item.role === 'admin' ? 'danger' : item.role === 'editor' ? 'warning' : 'default'}>
+              {item.role}
+            </Badge>
+          ),
+        },
+        { 
+          key: 'status', 
+          header: 'Status',
+          render: (item) => (
+            <Badge variant={item.status === 'active' ? 'success' : item.status === 'pending' ? 'warning' : 'danger'}>
+              {item.status}
+            </Badge>
+          ),
+        },
+      ]}
+      data={sampleUsers}
+      keyExtractor={(item) => item.id}
+    />
+  ),
 };
 
 export const Sortable: Story = {
-  args: {
-    columns: stockColumns,
-    data: sampleStocks,
-    keyExtractor: (item: Stock) => item.id,
-    sortColumn: 'price',
-    sortDirection: 'desc',
-    onSort: (column: string) => alert(`Sorting by ${column}`),
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol', sortable: true },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price', sortable: true, render: (item) => `$${item.price.toFixed(2)}` },
+      ]}
+      data={sampleStocks}
+      keyExtractor={(item) => item.id}
+      sortColumn="price"
+      sortDirection="desc"
+      onSort={(column) => alert(`Sorting by ${column}`)}
+    />
+  ),
 };
 
 export const CustomStyling: Story = {
-  args: {
-    columns: stockColumns,
-    data: sampleStocks,
-    keyExtractor: (item: Stock) => item.id,
-    className: 'border-primary/30',
-  },
+  render: () => (
+    <Table<Stock>
+      columns={[
+        { key: 'symbol', header: 'Symbol' },
+        { key: 'name', header: 'Name' },
+        { key: 'price', header: 'Price', render: (item) => `$${item.price.toFixed(2)}` },
+      ]}
+      data={sampleStocks}
+      keyExtractor={(item) => item.id}
+      className="border-primary/30"
+    />
+  ),
 };

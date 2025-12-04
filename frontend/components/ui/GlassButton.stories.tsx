@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Search, Plus, ArrowRight, Download, Settings } from 'lucide-react';
+import { Search, Plus, ArrowRight, Settings } from 'lucide-react';
 import { GlassButton } from './GlassButton';
 
 const meta: Meta<typeof GlassButton> = {
