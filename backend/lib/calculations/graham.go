@@ -194,7 +194,7 @@ func BuffettIntrinsicValue(ownerEarnings, growthRate, discountRate float64, year
 	}
 
 	// Terminal value
-	terminalEarnings := currentEarnings * (1 + 3/100) // 3% perpetual growth
+	terminalEarnings := currentEarnings * (1 + 3.0/100) // 3% perpetual growth
 	terminalValue := terminalEarnings / ((discountRate - 3) / 100)
 	pvTerminal := terminalValue / math.Pow(1+discountRate/100, float64(years))
 
