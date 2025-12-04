@@ -5,12 +5,14 @@ Integrated Sports Betting Analytics & Stock Monitoring Platform
 ## 🚀 Features
 
 ### Betting Analytics
+
 - **Value Bet Detection** - Find betting opportunities with positive expected value
 - **Poisson Calculator** - Predict goal probabilities using Poisson distribution
 - **Kelly Criterion** - Calculate optimal stake sizes
 - **Match Analysis** - Head-to-head history, team form, and odds comparison
 
 ### Stock Monitoring
+
 - **Real-time Quotes** - Track stock prices with live updates
 - **Technical Analysis** - RSI, MACD, Bollinger Bands, and more
 - **Watchlist** - Create and manage custom watchlists
@@ -18,12 +20,14 @@ Integrated Sports Betting Analytics & Stock Monitoring Platform
 - **News Feed** - Stay updated with market news
 
 ### Paper Trading
+
 - **Risk-free Trading** - Practice with virtual money
 - **Portfolio Tracking** - Monitor your positions and P&L
 - **Trade Journal** - Log and review your trades
 - **Leaderboard** - Compete with other traders
 
 ### Analytics
+
 - **Performance Charts** - Track your portfolio over time
 - **Drawdown Analysis** - Understand your risk exposure
 - **Goal Tracking** - Set and monitor financial goals
@@ -32,6 +36,7 @@ Integrated Sports Betting Analytics & Stock Monitoring Platform
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **Next.js 15** with App Router
 - **React 18.3** with TypeScript 5.x
 - **Tailwind CSS 3.x** with Liquid Glass design
@@ -41,6 +46,7 @@ Integrated Sports Betting Analytics & Stock Monitoring Platform
 - **next-intl** for i18n (English & Thai)
 
 ### Backend
+
 - **Go 1.21** with Gin framework
 - **PostgreSQL 15** for data storage
 - **Redis 7** for caching
@@ -94,6 +100,7 @@ super-dashboard/
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - Go 1.23+
 - Docker & Docker Compose
@@ -101,28 +108,33 @@ super-dashboard/
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/awaymess/super-dashboard.git
 cd super-dashboard
 ```
 
 2. Set up environment (optional - defaults work for mock mode)
+
 ```bash
 cp backend/.env.example backend/.env
 # Edit backend/.env to configure your settings
 ```
 
 3. Install dependencies
+
 ```bash
 make install
 ```
 
 4. Start the development environment
+
 ```bash
 make dev
 ```
 
 5. Open your browser
+
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8080
 
@@ -131,6 +143,7 @@ For detailed local development instructions, see [docs/run-locally.md](docs/run-
 ## 📋 Available Commands
 
 ### Root Makefile
+
 ```bash
 make install      # Install all dependencies
 
@@ -174,6 +187,7 @@ make migrate-up   # Run database migrations
 ```
 
 ### Frontend
+
 ```bash
 cd frontend
 npm run dev       # Start development server
@@ -183,29 +197,40 @@ npm run storybook # Start Storybook
 ```
 
 ### Backend
+
 ```bash
 cd backend
 make run          # Run the server
 make build        # Build binary
 make test         # Run tests
 make swagger      # Generate API docs
+
+
+# Regenerate docs (host set to 8080)
+make swagger
+
+# Serve Swagger UI on 8081 (reads spec pointing to 8080)
+make swagger-ui
+# Open http://localhost:8081 and use Try it out
+
 ```
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl + K` | Open Command Palette |
-| `D` | Go to Dashboard |
-| `B` | Go to Betting |
-| `S` | Go to Stocks |
-| `P` | Go to Paper Trading |
-| `A` | Go to Analytics |
-| `?` | Show Keyboard Shortcuts |
+| Shortcut   | Action                  |
+| ---------- | ----------------------- |
+| `Ctrl + K` | Open Command Palette    |
+| `D`        | Go to Dashboard         |
+| `B`        | Go to Betting           |
+| `S`        | Go to Stocks            |
+| `P`        | Go to Paper Trading     |
+| `A`        | Go to Analytics         |
+| `?`        | Show Keyboard Shortcuts |
 
 ## 🎨 UI Design: Liquid Glass
 
 The interface features a modern "Liquid Glass" design with:
+
 - Dark theme with deep background (#0a0a0f)
 - Glass morphism effects with blur and transparency
 - Smooth animations and transitions
@@ -214,6 +239,7 @@ The interface features a modern "Liquid Glass" design with:
 ## 🌐 Internationalization
 
 The app supports two languages:
+
 - English (default)
 - Thai (ไทย)
 
