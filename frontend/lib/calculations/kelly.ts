@@ -137,3 +137,177 @@ export function calculateHalfKelly(probability: number, odds: number): number {
 export function calculateQuarterKelly(probability: number, odds: number): number {
   return calculateFullKelly(probability, odds) * 0.25;
 }
+
+/**
+ * Calculate implied probability from decimal odds
+ * @param decimalOdds - Decimal odds (e.g., 2.00)
+ * @returns Implied probability as percentage (0-100)
+ */
+export function calculateImpliedProbability(decimalOdds: number): number {
+  if (decimalOdds <= 1) return 0;
+  return (1 / decimalOdds) * 100;
+}
+
+/**
+ * Convert probability to fair odds
+ * @param probability - Probability as percentage (0-100)
+ * @returns Fair decimal odds
+ */
+export function probabilityToOdds(probability: number): number {
+  if (probability <= 0 || probability >= 100) return 0;
+  return 100 / probability;
+}
+
+/**
+ * Calculate value bet with threshold detection
+ * @param trueProbability - True probability as percentage (0-100)
+ * @param bookmakerOdds - Bookmaker decimal odds
+ * @param valueThreshold - Minimum value percentage to consider (default 5%)
+ * @returns Value bet analysis result
+ */
+export function detectValueBet(
+  trueProbability: number,
+  bookmakerOdds: number,
+  valueThreshold: number = 5
+): {
+  impliedProbability: number;
+  value: number;
+  isValueBet: boolean;
+  isHighValue: boolean;
+  expectedValue: number;
+  recommendation: 'skip' | 'bet' | 'strong_bet';
+} {
+  const impliedProbability = calculateImpliedProbability(bookmakerOdds);
+  const value = trueProbability - impliedProbability;
+  const expectedValue = (trueProbability / 100) * (bookmakerOdds - 1) - (1 - trueProbability / 100);
+  
+  let recommendation: 'skip' | 'bet' | 'strong_bet' = 'skip';
+  if (value > 10) {
+    recommendation = 'strong_bet';
+  } else if (value > valueThreshold) {
+    recommendation = 'bet';
+  }
+
+  return {
+    impliedProbability,
+    value,
+    isValueBet: value > valueThreshold,
+    isHighValue: value > 10,
+    expectedValue: expectedValue * 100,
+    recommendation,
+  };
+}
+
+/**
+ * Bayesian probability update based on new evidence
+ * @param priorProbability - Prior probability (0-1)
+ * @param likelihood - Probability of evidence given hypothesis (0-1)
+ * @param evidenceProbability - Overall probability of evidence (0-1)
+ * @returns Updated (posterior) probability
+ */
+export function bayesianUpdate(
+  priorProbability: number,
+  likelihood: number,
+  evidenceProbability: number
+): number {
+  if (evidenceProbability === 0) return priorProbability;
+  return (likelihood * priorProbability) / evidenceProbability;
+}
+
+/**
+ * Calculate weighted average probability from multiple models
+ * @param probabilities - Array of probability estimates (0-100)
+ * @param weights - Array of weights for each model (should sum to 1)
+ * @returns Weighted average probability
+ */
+export function calculateWeightedProbability(
+  probabilities: number[],
+  weights: number[]
+): number {
+  if (probabilities.length !== weights.length) {
+    throw new Error('Probabilities and weights arrays must have the same length');
+  }
+  
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  if (Math.abs(totalWeight - 1) > 0.001) {
+    // Normalize weights if they don't sum to 1
+    const normalizedWeights = weights.map(w => w / totalWeight);
+    return probabilities.reduce((sum, prob, i) => sum + prob * normalizedWeights[i], 0);
+  }
+  
+  return probabilities.reduce((sum, prob, i) => sum + prob * weights[i], 0);
+}
+
+/**
+ * Calculate ensemble probability from multiple models
+ * Uses equal weights by default
+ * @param poissonProb - Probability from Poisson model
+ * @param eloProb - Probability from ELO model
+ * @param statProb - Probability from statistics-based model
+ * @param xgProb - Probability from xG model (optional)
+ * @returns Ensemble probability
+ */
+export function calculateEnsembleProbability(
+  poissonProb: number,
+  eloProb: number,
+  statProb: number,
+  xgProb?: number
+): number {
+  const probs = [poissonProb, eloProb, statProb];
+  if (xgProb !== undefined) {
+    probs.push(xgProb);
+  }
+  const equalWeight = 1 / probs.length;
+  const weights = probs.map(() => equalWeight);
+  return calculateWeightedProbability(probs, weights);
+}
+
+/**
+ * Find arbitrage opportunities between bookmakers
+ * @param odds - Array of odds from different bookmakers [home, draw, away][]
+ * @returns Arbitrage analysis
+ */
+export function findArbitrage(
+  homeOdds: number[],
+  drawOdds: number[],
+  awayOdds: number[]
+): {
+  isArbitrage: boolean;
+  margin: number;
+  bestHome: { index: number; odds: number };
+  bestDraw: { index: number; odds: number };
+  bestAway: { index: number; odds: number };
+  stakes?: { home: number; draw: number; away: number };
+} {
+  const bestHome = { index: 0, odds: Math.max(...homeOdds) };
+  bestHome.index = homeOdds.indexOf(bestHome.odds);
+  
+  const bestDraw = { index: 0, odds: Math.max(...drawOdds) };
+  bestDraw.index = drawOdds.indexOf(bestDraw.odds);
+  
+  const bestAway = { index: 0, odds: Math.max(...awayOdds) };
+  bestAway.index = awayOdds.indexOf(bestAway.odds);
+  
+  const totalImplied = (1 / bestHome.odds) + (1 / bestDraw.odds) + (1 / bestAway.odds);
+  const margin = (1 - totalImplied) * 100;
+  const isArbitrage = totalImplied < 1;
+  
+  let stakes;
+  if (isArbitrage) {
+    const total = 100;
+    stakes = {
+      home: (total / bestHome.odds) / totalImplied,
+      draw: (total / bestDraw.odds) / totalImplied,
+      away: (total / bestAway.odds) / totalImplied,
+    };
+  }
+  
+  return {
+    isArbitrage,
+    margin,
+    bestHome,
+    bestDraw,
+    bestAway,
+    stakes,
+  };
+}
