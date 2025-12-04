@@ -133,6 +133,12 @@ For detailed local development instructions, see [docs/run-locally.md](docs/run-
 ### Root Makefile
 ```bash
 make install      # Install all dependencies
+
+# Ensure environment points to default socket
+docker context use default
+# Restart Docker Desktop app
+open -a "Docker"
+
 make dev          # Start development servers
 make run          # Run backend server only
 make build        # Build for production
@@ -141,6 +147,7 @@ make clean        # Clean build artifacts
 make docker-up    # Start Docker services
 make docker-down  # Stop Docker services
 make migrate-up   # Run database migrations
+
 ```
 
 ### Frontend
