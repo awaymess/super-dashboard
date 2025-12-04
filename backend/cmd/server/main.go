@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -56,8 +57,37 @@ func main() {
 		})
 	}
 
-	// Initialize database and services only if not using mock data
-	if !cfg.UseMockData && cfg.DatabaseURL != "" {
+	// Initialize services based on configuration
+	if cfg.UseMockData {
+		// Use mock repositories
+		log.Info().Msg("Initializing mock data repositories")
+
+		// Find mock data directory
+		mockDir := findMockDir()
+
+		// Initialize match repository
+		matchRepo, err := repository.NewMockMatchRepository(filepath.Join(mockDir, "matches.json"))
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to load mock match data")
+		} else {
+			matchHandler := handler.NewMatchHandler(matchRepo)
+			matchHandler.RegisterMatchRoutes(v1)
+			log.Info().Msg("Match endpoints registered with mock data")
+		}
+
+		// Initialize stock repository
+		stockRepo, err := repository.NewMockStockRepository(filepath.Join(mockDir, "stocks.json"))
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to load mock stock data")
+		} else {
+			stockHandler := handler.NewStockHandler(stockRepo)
+			stockHandler.RegisterStockRoutes(v1)
+			log.Info().Msg("Stock endpoints registered with mock data")
+		}
+
+		log.Info().Msg("Running with mock data mode")
+	} else if cfg.DatabaseURL != "" {
+		// Use database repositories
 		db, err := database.Connect(cfg.DatabaseURL)
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to connect to database")
@@ -82,7 +112,7 @@ func main() {
 
 		log.Info().Msg("Database-backed services initialized")
 	} else {
-		log.Info().Msg("Running with mock data mode - auth endpoints not available")
+		log.Warn().Msg("No database URL configured and not in mock mode")
 	}
 
 	// Start server
@@ -91,4 +121,20 @@ func main() {
 	if err := r.Run(addr); err != nil {
 		log.Fatal().Err(err).Msg("Failed to start server")
 	}
+}
+
+// findMockDir finds the mock data directory.
+func findMockDir() string {
+	// Try relative paths from different working directories
+	paths := []string{
+		"mock",
+		"../mock",
+		"backend/mock",
+	}
+	for _, p := range paths {
+		if _, err := filepath.Glob(filepath.Join(p, "*.json")); err == nil {
+			return p
+		}
+	}
+	return "mock"
 }

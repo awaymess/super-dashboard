@@ -1,0 +1,80 @@
+{
+  "teams": [
+    { "id": "manu", "name": "Manchester United", "country": "England", "elo": 1850 },
+    { "id": "manc", "name": "Manchester City", "country": "England", "elo": 2100 },
+    { "id": "liverpool", "name": "Liverpool", "country": "England", "elo": 2050 },
+    { "id": "chelsea", "name": "Chelsea", "country": "England", "elo": 1900 },
+    { "id": "arsenal", "name": "Arsenal", "country": "England", "elo": 2020 },
+    { "id": "tottenham", "name": "Tottenham Hotspur", "country": "England", "elo": 1880 },
+    { "id": "realmadrid", "name": "Real Madrid", "country": "Spain", "elo": 2080 },
+    { "id": "barcelona", "name": "FC Barcelona", "country": "Spain", "elo": 2000 },
+    { "id": "bayern", "name": "Bayern Munich", "country": "Germany", "elo": 2070 },
+    { "id": "psg", "name": "Paris Saint-Germain", "country": "France", "elo": 1980 }
+  ],
+  "matches": [
+    {
+      "id": "1",
+      "league": "Premier League",
+      "home_team_id": "manu",
+      "away_team_id": "manc",
+      "start_time": "2024-12-07T17:30:00Z",
+      "status": "scheduled",
+      "venue": "Old Trafford"
+    },
+    {
+      "id": "2",
+      "league": "Premier League",
+      "home_team_id": "liverpool",
+      "away_team_id": "chelsea",
+      "start_time": "2024-12-07T15:00:00Z",
+      "status": "scheduled",
+      "venue": "Anfield"
+    },
+    {
+      "id": "3",
+      "league": "Premier League",
+      "home_team_id": "arsenal",
+      "away_team_id": "tottenham",
+      "start_time": "2024-12-08T16:30:00Z",
+      "status": "scheduled",
+      "venue": "Emirates Stadium"
+    },
+    {
+      "id": "4",
+      "league": "La Liga",
+      "home_team_id": "realmadrid",
+      "away_team_id": "barcelona",
+      "start_time": "2024-12-14T21:00:00Z",
+      "status": "scheduled",
+      "venue": "Santiago Bernabéu"
+    },
+    {
+      "id": "5",
+      "league": "Bundesliga",
+      "home_team_id": "bayern",
+      "away_team_id": "dortmund",
+      "start_time": "2024-12-15T18:30:00Z",
+      "status": "scheduled",
+      "venue": "Allianz Arena"
+    }
+  ],
+  "odds": [
+    { "id": "o1", "match_id": "1", "bookmaker": "Bet365", "market": "1X2", "outcome": "1", "price": 3.50 },
+    { "id": "o2", "match_id": "1", "bookmaker": "Bet365", "market": "1X2", "outcome": "X", "price": 3.40 },
+    { "id": "o3", "match_id": "1", "bookmaker": "Bet365", "market": "1X2", "outcome": "2", "price": 2.10 },
+    { "id": "o4", "match_id": "1", "bookmaker": "Bet365", "market": "O/U 2.5", "outcome": "Over", "price": 1.75 },
+    { "id": "o5", "match_id": "1", "bookmaker": "Bet365", "market": "O/U 2.5", "outcome": "Under", "price": 2.05 },
+    { "id": "o6", "match_id": "2", "bookmaker": "Bet365", "market": "1X2", "outcome": "1", "price": 1.55 },
+    { "id": "o7", "match_id": "2", "bookmaker": "Bet365", "market": "1X2", "outcome": "X", "price": 4.20 },
+    { "id": "o8", "match_id": "2", "bookmaker": "Bet365", "market": "1X2", "outcome": "2", "price": 5.50 },
+    { "id": "o9", "match_id": "3", "bookmaker": "Bet365", "market": "1X2", "outcome": "1", "price": 1.75 },
+    { "id": "o10", "match_id": "3", "bookmaker": "Bet365", "market": "1X2", "outcome": "X", "price": 3.80 },
+    { "id": "o11", "match_id": "3", "bookmaker": "Bet365", "market": "1X2", "outcome": "2", "price": 4.50 },
+    { "id": "o12", "match_id": "4", "bookmaker": "Bet365", "market": "1X2", "outcome": "1", "price": 2.30 },
+    { "id": "o13", "match_id": "4", "bookmaker": "Bet365", "market": "1X2", "outcome": "X", "price": 3.50 },
+    { "id": "o14", "match_id": "4", "bookmaker": "Bet365", "market": "1X2", "outcome": "2", "price": 2.90 },
+    { "id": "o15", "match_id": "5", "bookmaker": "Bet365", "market": "1X2", "outcome": "1", "price": 1.55 },
+    { "id": "o16", "match_id": "5", "bookmaker": "Bet365", "market": "1X2", "outcome": "X", "price": 4.20 },
+    { "id": "o17", "match_id": "5", "bookmaker": "Bet365", "market": "1X2", "outcome": "2", "price": 5.50 }
+  ]
+}
