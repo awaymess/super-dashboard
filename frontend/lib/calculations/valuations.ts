@@ -84,8 +84,11 @@ export function calculatePBVValuation(inputs: PBVValuationInputs): {
     : 0;
   
   // Calculate justified P/BV if ROE is provided
-  // Justified P/BV = (ROE - g) / (r - g), simplified to ROE/cost of equity
-  const justifiedPBV = roe ? roe / 10 : undefined; // Assuming 10% cost of equity
+  // Justified P/BV = (ROE - g) / (r - g), simplified to ROE / cost of equity
+  // Using 10% cost of equity as a typical equity risk premium for stable companies
+  // This is based on historical equity returns and should be adjusted for market conditions
+  const COST_OF_EQUITY = 10; // 10% - typical cost of equity for stable companies
+  const justifiedPBV = roe ? roe / COST_OF_EQUITY : undefined;
   
   return {
     fairPrice,
@@ -119,9 +122,13 @@ export function calculateBuffettValue(inputs: BuffettInputs): {
   }
   
   // Terminal value using perpetuity growth model
-  const terminalGrowth = 2.5; // Conservative long-term growth
-  const terminalEarnings = currentEarnings * (1 + terminalGrowth / 100);
-  const terminalValue = terminalEarnings / ((discountRate - terminalGrowth) / 100);
+  // Using 2.5% terminal growth as a conservative estimate - this represents:
+  // - Long-term GDP growth rate (typically 2-3%)
+  // - Should never exceed the discount rate
+  // - Represents sustainable growth into perpetuity
+  const TERMINAL_GROWTH_RATE = 2.5;
+  const terminalEarnings = currentEarnings * (1 + TERMINAL_GROWTH_RATE / 100);
+  const terminalValue = terminalEarnings / ((discountRate - TERMINAL_GROWTH_RATE) / 100);
   const pvTerminal = terminalValue / Math.pow(1 + discountRate / 100, years);
   
   const intrinsicValue = totalPV + pvTerminal;

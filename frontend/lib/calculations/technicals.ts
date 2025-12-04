@@ -292,6 +292,7 @@ export function calculateFibonacciRetracement(
   
   if (isUptrend) {
     // Retracement from high to low (price pulled back from high)
+    // Extensions project above the high (beyond the original move)
     return {
       level0: high,
       level236: high - diff * 0.236,
@@ -300,11 +301,13 @@ export function calculateFibonacciRetracement(
       level618: high - diff * 0.618,
       level786: high - diff * 0.786,
       level1000: low,
+      // Extensions: 127.2% = high + (diff * 0.272), 161.8% = high + (diff * 0.618)
       extension1272: high + diff * 0.272,
       extension1618: high + diff * 0.618,
     };
   } else {
-    // Retracement from low to high (price bounced from low)
+    // Retracement from low to high (price bounced from low in downtrend)
+    // Extensions project below the low (beyond the original move down)
     return {
       level0: low,
       level236: low + diff * 0.236,
@@ -313,6 +316,7 @@ export function calculateFibonacciRetracement(
       level618: low + diff * 0.618,
       level786: low + diff * 0.786,
       level1000: high,
+      // Extensions project below low for downtrend continuation
       extension1272: low - diff * 0.272,
       extension1618: low - diff * 0.618,
     };

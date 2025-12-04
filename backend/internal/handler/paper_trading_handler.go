@@ -281,8 +281,10 @@ func (h *PaperTradingHandler) ExecuteTrade(c *gin.Context) {
 		return
 	}
 
-	// Mock execution price
-	price := 189.95 // Would normally fetch real price
+	// TODO: Replace with actual market data integration
+	// This should fetch real-time price from a market data provider
+	// For now, using a mock price for paper trading simulation
+	price := 189.95 // Mock price - integrate with stock data service
 	total := float64(req.Quantity) * price
 
 	transaction := TransactionResponse{

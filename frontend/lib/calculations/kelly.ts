@@ -225,7 +225,7 @@ export function calculateWeightedProbability(
   weights: number[]
 ): number {
   if (probabilities.length !== weights.length) {
-    throw new Error('Probabilities and weights arrays must have the same length');
+    throw new Error(`Probabilities array length (${probabilities.length}) must match weights array length (${weights.length})`);
   }
   
   const totalWeight = weights.reduce((sum, w) => sum + w, 0);
