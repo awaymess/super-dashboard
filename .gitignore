@@ -27,6 +27,7 @@ backend/coverage/
 backend/*.test
 backend/*.out
 backend/.cache/
+backend/server
 
 # Go modules cache (optional if vendored)
 backend/vendor/

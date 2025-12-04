@@ -325,6 +325,92 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
 
+  /api/v1/nlp/ingest:
+    post:
+      tags: [nlp]
+      summary: Ingest news article
+      description: Ingest a news article for NLP processing (sentiment analysis, embedding generation)
+      operationId: ingestNews
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewsIngestRequest'
+      responses:
+        '201':
+          description: News article ingested successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsIngestResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /api/v1/nlp/search:
+    get:
+      tags: [nlp]
+      summary: Semantic search
+      description: Search news articles using semantic similarity
+      operationId: semanticSearch
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query text
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Maximum number of results
+          schema:
+            type: integer
+            default: 10
+            maximum: 100
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /api/v1/nlp/sentiment/{symbol}:
+    get:
+      tags: [nlp]
+      summary: Get sentiment for symbol
+      description: Get aggregated sentiment analysis for a stock symbol
+      operationId: getSymbolSentiment
+      parameters:
+        - name: symbol
+          in: path
+          required: true
+          description: Stock symbol (e.g., AAPL)
+          schema:
+            type: string
+        - name: days
+          in: query
+          description: Number of days to analyze
+          schema:
+            type: integer
+            default: 7
+            maximum: 90
+      responses:
+        '200':
+          description: Sentiment analysis for symbol
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SymbolSentimentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -657,3 +743,110 @@ components:
         executed_at:
           type: string
           format: date-time
+
+    NewsIngestRequest:
+      type: object
+      required: [title, content]
+      properties:
+        title:
+          type: string
+          description: News article title
+        content:
+          type: string
+          description: News article content
+        source:
+          type: string
+          description: News source (e.g., Reuters, Bloomberg)
+        url:
+          type: string
+          format: uri
+          description: Original article URL
+        symbols:
+          type: array
+          items:
+            type: string
+          description: Related stock symbols
+
+    NewsIngestResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sentiment:
+          type: object
+          properties:
+            score:
+              type: number
+              description: Sentiment score from -1 (negative) to 1 (positive)
+            label:
+              type: string
+              enum: [positive, neutral, negative]
+        event_type:
+          type: string
+          enum: [product_launch, earnings, merger_acquisition, lawsuit, executive_change, dividend, stock_split, bankruptcy, regulation, partnership, layoff, expansion, other]
+        embedding_created:
+          type: boolean
+
+    SearchResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        snippet:
+          type: string
+        similarity:
+          type: number
+          description: Cosine similarity score (0-1)
+        sentiment:
+          type: string
+          enum: [positive, neutral, negative]
+        published_at:
+          type: string
+          format: date-time
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SearchResult'
+        query_embedding_time_ms:
+          type: integer
+          description: Time taken to generate query embedding
+        search_time_ms:
+          type: integer
+          description: Time taken to perform similarity search
+
+    SentimentDistribution:
+      type: object
+      properties:
+        positive:
+          type: integer
+        neutral:
+          type: integer
+        negative:
+          type: integer
+
+    SymbolSentimentResponse:
+      type: object
+      properties:
+        symbol:
+          type: string
+        period_days:
+          type: integer
+        article_count:
+          type: integer
+        average_sentiment:
+          type: number
+          description: Average sentiment score from -1 to 1
+        sentiment_distribution:
+          $ref: '#/components/schemas/SentimentDistribution'
+        trending_topics:
+          type: array
+          items:
+            type: string
