@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -8,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/superdashboard/backend/internal/model"
-	"github.com/superdashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
 )
 
 // Token duration constants.
@@ -25,7 +26,16 @@ var (
 	ErrUserAlreadyExists = errors.New("user with this email already exists")
 	// ErrInvalidToken is returned when a JWT token is invalid.
 	ErrInvalidToken = errors.New("invalid token")
+	// ErrRefreshTokenNotFound is returned when refresh token is not found in storage.
+	ErrRefreshTokenNotFound = errors.New("refresh token not found")
 )
+
+// TokenStore defines the interface for token storage operations.
+type TokenStore interface {
+	SetRefreshToken(ctx context.Context, userID, tokenID string, expiration time.Duration) error
+	GetRefreshToken(ctx context.Context, tokenID string) (string, error)
+	DeleteRefreshToken(ctx context.Context, tokenID string) error
+}
 
 // AuthService defines the interface for authentication operations.
 type AuthService interface {
@@ -37,15 +47,18 @@ type AuthService interface {
 
 // authService implements AuthService.
 type authService struct {
-	userRepo  repository.UserRepository
-	jwtSecret string
+	userRepo   repository.UserRepository
+	tokenStore TokenStore
+	jwtSecret  string
 }
 
 // NewAuthService creates a new AuthService instance.
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) AuthService {
+// tokenStore can be nil for JWT-only token validation (no Redis persistence).
+func NewAuthService(userRepo repository.UserRepository, jwtSecret string, tokenStore TokenStore) AuthService {
 	return &authService{
-		userRepo:  userRepo,
-		jwtSecret: jwtSecret,
+		userRepo:   userRepo,
+		tokenStore: tokenStore,
+		jwtSecret:  jwtSecret,
 	}
 }
 
@@ -93,15 +106,25 @@ func (s *authService) Login(email, password string) (string, string, error) {
 	}
 
 	// Generate access token
-	accessToken, err := s.generateToken(user.ID, user.Email, user.Role, AccessTokenDuration)
+	accessToken, err := s.generateToken(user.ID, user.Email, user.Role, AccessTokenDuration, "")
 	if err != nil {
 		return "", "", err
 	}
 
-	// Generate refresh token
-	refreshToken, err := s.generateToken(user.ID, user.Email, user.Role, RefreshTokenDuration)
+	// Generate refresh token with JTI for Redis storage
+	jti := uuid.New().String()
+	refreshToken, err := s.generateToken(user.ID, user.Email, user.Role, RefreshTokenDuration, jti)
 	if err != nil {
 		return "", "", err
+	}
+
+	// Store refresh token in Redis if token store is available
+	if s.tokenStore != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := s.tokenStore.SetRefreshToken(ctx, user.ID.String(), jti, RefreshTokenDuration); err != nil {
+			return "", "", err
+		}
 	}
 
 	return accessToken, refreshToken, nil
@@ -133,8 +156,28 @@ func (s *authService) RefreshToken(refreshToken string) (string, error) {
 		role = "user"
 	}
 
+	// Verify refresh token exists in Redis if token store is available
+	if s.tokenStore != nil {
+		jti, ok := (*claims)["jti"].(string)
+		if !ok {
+			return "", ErrInvalidToken
+		}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		storedUserID, err := s.tokenStore.GetRefreshToken(ctx, jti)
+		if err != nil {
+			return "", ErrRefreshTokenNotFound
+		}
+
+		if storedUserID != userIDStr {
+			return "", ErrInvalidToken
+		}
+	}
+
 	// Generate new access token
-	return s.generateToken(userID, email, role, AccessTokenDuration)
+	return s.generateToken(userID, email, role, AccessTokenDuration, "")
 }
 
 // ValidateToken validates a JWT token and returns its claims.
@@ -159,13 +202,18 @@ func (s *authService) ValidateToken(tokenString string) (*jwt.MapClaims, error) 
 }
 
 // generateToken creates a new JWT token with the given claims.
-func (s *authService) generateToken(userID uuid.UUID, email, role string, expiry time.Duration) (string, error) {
+func (s *authService) generateToken(userID uuid.UUID, email, role string, expiry time.Duration, jti string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID.String(),
 		"email":   email,
 		"role":    role,
 		"exp":     time.Now().Add(expiry).Unix(),
 		"iat":     time.Now().Unix(),
+	}
+
+	// Add JTI for refresh tokens
+	if jti != "" {
+		claims["jti"] = jti
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

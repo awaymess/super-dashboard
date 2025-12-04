@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/superdashboard/backend/internal/service"
+	"github.com/awaymess/super-dashboard/backend/internal/service"
 )
 
 // AuthHandler handles authentication-related HTTP requests.
