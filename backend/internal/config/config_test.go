@@ -91,3 +91,72 @@ func TestLoadDefaults(t *testing.T) {
 		t.Errorf("Expected default UseMockData to be true, got %v", cfg.UseMockData)
 	}
 }
+
+func TestParseBoolEnv(t *testing.T) {
+	tests := []struct {
+		name     string
+		value    string
+		expected bool
+	}{
+		{"empty string defaults to true", "", true},
+		{"false lowercase", "false", false},
+		{"FALSE uppercase", "FALSE", false},
+		{"False mixed case", "False", false},
+		{"0 numeric", "0", false},
+		{"no lowercase", "no", false},
+		{"NO uppercase", "NO", false},
+		{"off lowercase", "off", false},
+		{"OFF uppercase", "OFF", false},
+		{"true lowercase", "true", true},
+		{"TRUE uppercase", "TRUE", true},
+		{"True mixed case", "True", true},
+		{"1 numeric", "1", true},
+		{"yes lowercase", "yes", true},
+		{"YES uppercase", "YES", true},
+		{"on lowercase", "on", true},
+		{"ON uppercase", "ON", true},
+		{"with whitespace", "  false  ", false},
+		{"invalid defaults to true", "invalid", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := parseBoolEnv(tt.value, true)
+			if result != tt.expected {
+				t.Errorf("parseBoolEnv(%q, true) = %v, want %v", tt.value, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestUseMockDataRobustParsing(t *testing.T) {
+	tests := []struct {
+		name     string
+		envValue string
+		expected bool
+	}{
+		{"false lowercase", "false", false},
+		{"FALSE uppercase", "FALSE", false},
+		{"0 numeric", "0", false},
+		{"true lowercase", "true", true},
+		{"TRUE uppercase", "TRUE", true},
+		{"1 numeric", "1", true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			os.Setenv("USE_MOCK_DATA", tt.envValue)
+			defer os.Unsetenv("USE_MOCK_DATA")
+
+			cfg, err := Load()
+			if err != nil {
+				t.Fatalf("Failed to load config: %v", err)
+			}
+
+			if cfg.UseMockData != tt.expected {
+				t.Errorf("Expected UseMockData to be %v with env value %q, got %v",
+					tt.expected, tt.envValue, cfg.UseMockData)
+			}
+		})
+	}
+}

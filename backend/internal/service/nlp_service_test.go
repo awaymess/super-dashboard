@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/superdashboard/backend/internal/repository"
-	"github.com/superdashboard/backend/pkg/nlp"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/pkg/nlp"
 )
 
 func setupNLPService() NLPService {

@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
-	"github.com/superdashboard/backend/internal/repository"
-	"github.com/superdashboard/backend/pkg/nlp"
-	"github.com/superdashboard/backend/pkg/pq"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/pkg/nlp"
+	"github.com/awaymess/super-dashboard/backend/pkg/pq"
 )
 
 // NLPService defines the interface for NLP operations.

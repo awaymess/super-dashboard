@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/superdashboard/backend/internal/service"
+	"github.com/awaymess/super-dashboard/backend/internal/service"
 )
 
 // NLPHandler handles NLP-related HTTP requests.

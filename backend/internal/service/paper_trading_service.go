@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
-	"github.com/superdashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
 )
 
 // Paper trading service errors.

@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
-	"github.com/superdashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
 )
 
 // StockPriceIngester ingests mock stock prices when USE_MOCK_DATA is true.
@@ -54,7 +54,7 @@ func NewStockPriceIngester(mockDir string, useMockData bool) *StockPriceIngester
 func (s *StockPriceIngester) IngestMockPricesJob() *Job {
 	return &Job{
 		Name:     "MockPriceIngestion",
-		Schedule: 30 * time.Second,
+		CronExpr: "*/30 * * * * *", // Every 30 seconds
 		Handler:  s.ingestMockPrices,
 	}
 }

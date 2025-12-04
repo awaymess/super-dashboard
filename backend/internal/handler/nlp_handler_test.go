@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/superdashboard/backend/internal/repository"
-	"github.com/superdashboard/backend/internal/service"
-	"github.com/superdashboard/backend/pkg/nlp"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/service"
+	"github.com/awaymess/super-dashboard/backend/pkg/nlp"
 )
 
 func setupNLPHandler() (*NLPHandler, *gin.Engine) {

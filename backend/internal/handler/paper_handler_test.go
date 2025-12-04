@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/superdashboard/backend/internal/model"
-	"github.com/superdashboard/backend/internal/service"
+	"github.com/awaymess/super-dashboard/backend/internal/model"
+	"github.com/awaymess/super-dashboard/backend/internal/service"
 )
 
 // mockPaperTradingService is a mock implementation of PaperTradingService.

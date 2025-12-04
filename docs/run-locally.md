@@ -97,6 +97,8 @@ curl http://localhost:8080/metrics
 | `make docker-down` | Stop all Docker services |
 | `make logs` | View Docker service logs |
 | `make migrate-up` | Run database migrations |
+| `make test-unit` | Run unit tests only |
+| `make test-integration` | Run integration tests (requires Postgres/Redis) |
 
 ## Environment Variables
 
@@ -123,6 +125,105 @@ This is useful for:
 - Local development without database setup
 - Testing frontend components
 - Demo purposes
+
+## Real Mode (USE_MOCK_DATA=false)
+
+When `USE_MOCK_DATA=false`, the backend:
+- Uses real PostgreSQL database for data persistence
+- Uses Redis for token storage and caching
+- Health readiness endpoint checks actual database and Redis connections
+- Returns 503 status if any dependency is unavailable
+
+To run in real mode:
+
+```bash
+# Set environment variable
+export USE_MOCK_DATA=false
+
+# Or update your .env file
+echo "USE_MOCK_DATA=false" >> backend/.env
+```
+
+## Running Integration Tests Locally
+
+Integration tests require PostgreSQL and Redis to be running. Follow these steps:
+
+### 1. Start Required Services
+
+```bash
+# Start Postgres and Redis using docker-compose
+docker-compose up -d postgres redis
+```
+
+### 2. Wait for Services to be Ready
+
+```bash
+# Check that services are healthy
+docker-compose ps
+```
+
+Ensure both `superdash-postgres` and `superdash-redis` show as healthy.
+
+### 3. Run Database Migrations
+
+```bash
+# Set environment variables
+export DATABASE_URL="postgres://superdash:superdash123@localhost:5432/superdashboard?sslmode=disable"
+
+# Run migrations
+cd backend && go run cmd/migrate/main.go
+```
+
+### 4. Run Integration Tests
+
+```bash
+# Set environment variables
+export DATABASE_URL="postgres://superdash:superdash123@localhost:5432/superdashboard?sslmode=disable"
+export REDIS_URL="redis://localhost:6379"
+export JWT_SECRET="test-secret"
+export USE_MOCK_DATA="false"
+
+# Run integration tests
+cd backend && go test -v -tags=integration ./...
+```
+
+### 5. Run Unit Tests Only
+
+```bash
+# Unit tests run with mock data and don't require external services
+cd backend && go test -v -tags=unit ./...
+
+# Or run all non-integration tests (default)
+cd backend && go test -v ./...
+```
+
+### Quick Integration Test Script
+
+For convenience, you can use this script to run integration tests:
+
+```bash
+#!/bin/bash
+# run-integration-tests.sh
+
+# Start services
+docker-compose up -d postgres redis
+
+# Wait for services to be healthy
+echo "Waiting for services to be ready..."
+sleep 10
+
+# Set environment
+export DATABASE_URL="postgres://superdash:superdash123@localhost:5432/superdashboard?sslmode=disable"
+export REDIS_URL="redis://localhost:6379"
+export JWT_SECRET="test-secret"
+export USE_MOCK_DATA="false"
+
+# Run migrations
+cd backend && go run cmd/migrate/main.go
+
+# Run tests
+go test -v -tags=integration ./...
+```
 
 ## Troubleshooting
 
@@ -153,3 +254,21 @@ docker-compose up -d postgres
 # Wait for health check
 docker-compose ps
 ```
+
+### Integration tests failing
+
+1. Ensure services are running and healthy:
+   ```bash
+   docker-compose ps
+   ```
+
+2. Check that migrations have run:
+   ```bash
+   cd backend && go run cmd/migrate/main.go
+   ```
+
+3. Verify environment variables are set correctly:
+   ```bash
+   echo $DATABASE_URL
+   echo $REDIS_URL
+   ```

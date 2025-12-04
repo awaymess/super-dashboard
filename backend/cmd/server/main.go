@@ -12,14 +12,14 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
-	"github.com/superdashboard/backend/internal/config"
-	"github.com/superdashboard/backend/internal/handler"
-	"github.com/superdashboard/backend/internal/repository"
-	"github.com/superdashboard/backend/internal/service"
-	"github.com/superdashboard/backend/pkg/database"
-	"github.com/superdashboard/backend/pkg/logger"
-	"github.com/superdashboard/backend/pkg/nlp"
-	"github.com/superdashboard/backend/pkg/redis"
+	"github.com/awaymess/super-dashboard/backend/internal/config"
+	"github.com/awaymess/super-dashboard/backend/internal/handler"
+	"github.com/awaymess/super-dashboard/backend/internal/repository"
+	"github.com/awaymess/super-dashboard/backend/internal/service"
+	"github.com/awaymess/super-dashboard/backend/pkg/database"
+	"github.com/awaymess/super-dashboard/backend/pkg/logger"
+	"github.com/awaymess/super-dashboard/backend/pkg/nlp"
+	"github.com/awaymess/super-dashboard/backend/pkg/redis"
 )
 
 func main() {
@@ -136,13 +136,16 @@ func main() {
 			log.Fatal().Err(err).Msg("Failed to connect to database")
 		}
 
-		// Add database health checker
+		// Add database health checker with timeout
 		healthHandler.AddHealthChecker(func() (string, bool, string) {
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+			defer cancel()
+			
 			sqlDB, err := db.DB()
 			if err != nil {
 				return "database", false, err.Error()
 			}
-			if err := sqlDB.Ping(); err != nil {
+			if err := sqlDB.PingContext(ctx); err != nil {
 				return "database", false, err.Error()
 			}
 			return "database", true, "connected"
@@ -168,9 +171,11 @@ func main() {
 				log.Warn().Err(err).Msg("Failed to connect to Redis, continuing without token persistence")
 			} else {
 				tokenStore = redisClient
-				// Add Redis health checker
+				// Add Redis health checker with timeout
 				healthHandler.AddHealthChecker(func() (string, bool, string) {
-					if err := redisClient.Ping(context.Background()); err != nil {
+					ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+					defer cancel()
+					if err := redisClient.Ping(ctx); err != nil {
 						return "redis", false, err.Error()
 					}
 					return "redis", true, "connected"
@@ -181,6 +186,7 @@ func main() {
 
 		// Initialize services
 		authService := service.NewAuthService(userRepo, cfg.JWTSecret, tokenStore)
+		paperService := service.NewPaperTradingService(portfolioRepo, positionRepo, orderRepo, tradeRepo, nil)
 
 		// Initialize handlers
 		authHandler := handler.NewAuthHandler(authService)
