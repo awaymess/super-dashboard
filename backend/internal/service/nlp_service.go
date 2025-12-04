@@ -199,28 +199,35 @@ func (s *nlpService) SemanticSearch(ctx context.Context, query string, limit int
 }
 
 // classifyEventType classifies the event type based on text content.
+// Uses ordered checks to ensure more specific keywords are matched before generic ones.
 func classifyEventType(text string) string {
 	text = strings.ToLower(text)
 
-	eventKeywords := map[string][]string{
-		"earnings":           {"earnings", "quarterly", "q1", "q2", "q3", "q4", "revenue", "profit", "eps", "beat expectations", "miss expectations"},
-		"product_launch":     {"launch", "announce", "new product", "release", "unveil", "introduce"},
-		"merger_acquisition": {"acquire", "acquisition", "merger", "merge", "buy", "buyout", "takeover"},
-		"lawsuit":            {"lawsuit", "sue", "legal", "court", "litigation", "settlement", "antitrust"},
-		"executive_change":   {"ceo", "cfo", "cto", "appoint", "resign", "step down", "retire", "executive"},
-		"dividend":           {"dividend", "payout", "distribution", "yield"},
-		"stock_split":        {"stock split", "split"},
-		"bankruptcy":         {"bankruptcy", "bankrupt", "chapter 11", "insolvent"},
-		"regulation":         {"regulation", "regulatory", "sec", "fcc", "ftc", "fine", "penalty", "compliance"},
-		"partnership":        {"partner", "partnership", "alliance", "collaborate", "joint venture"},
-		"layoff":             {"layoff", "lay off", "cut jobs", "workforce reduction", "restructuring", "downsize"},
-		"expansion":          {"expand", "expansion", "new market", "enter", "growth"},
+	// Check in order of specificity (more specific keywords first)
+	// This avoids issues with generic words like "announce" matching before specific terms
+	eventChecks := []struct {
+		eventType string
+		keywords  []string
+	}{
+		{"earnings", []string{"earnings", "quarterly", "q1", "q2", "q3", "q4", "revenue", "profit", "eps", "beat expectations", "miss expectations"}},
+		{"merger_acquisition", []string{"acquire", "acquisition", "merger", "merge", "buyout", "takeover"}},
+		{"lawsuit", []string{"lawsuit", "sue", "legal", "court", "litigation", "settlement", "antitrust"}},
+		{"executive_change", []string{"ceo", "cfo", "cto", "appoint", "resign", "step down", "retire", "executive"}},
+		{"dividend", []string{"dividend", "payout", "distribution", "yield"}},
+		{"stock_split", []string{"stock split", "split"}},
+		{"bankruptcy", []string{"bankruptcy", "bankrupt", "chapter 11", "insolvent"}},
+		{"regulation", []string{"regulation", "regulatory", "sec", "fcc", "ftc", "fine", "penalty", "compliance"}},
+		{"partnership", []string{"partner", "partnership", "alliance", "collaborate", "joint venture"}},
+		{"layoff", []string{"layoff", "lay off", "cut jobs", "workforce reduction", "restructuring", "downsize"}},
+		{"expansion", []string{"expand", "expansion", "new market", "enter", "growth"}},
+		// product_launch checked last as it has more generic keywords like "launch" and "release"
+		{"product_launch", []string{"launch", "new product", "release", "unveil", "introduce"}},
 	}
 
-	for eventType, keywords := range eventKeywords {
-		for _, keyword := range keywords {
+	for _, check := range eventChecks {
+		for _, keyword := range check.keywords {
 			if strings.Contains(text, keyword) {
-				return eventType
+				return check.eventType
 			}
 		}
 	}
