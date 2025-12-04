@@ -33,7 +33,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm ci
+          # Use install instead of ci to avoid lockfile sync issues in mono-repo
+          npm install
 
       - name: Lint
         run: |
