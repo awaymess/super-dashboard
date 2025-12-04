@@ -1,0 +1,26 @@
+{
+  "stocks": [
+    { "symbol": "AAPL", "name": "Apple Inc.", "market_cap": 2950000000000, "sector": "Technology" },
+    { "symbol": "MSFT", "name": "Microsoft Corporation", "market_cap": 2780000000000, "sector": "Technology" },
+    { "symbol": "GOOGL", "name": "Alphabet Inc.", "market_cap": 1720000000000, "sector": "Technology" },
+    { "symbol": "AMZN", "name": "Amazon.com Inc.", "market_cap": 1550000000000, "sector": "Consumer Discretionary" },
+    { "symbol": "NVDA", "name": "NVIDIA Corporation", "market_cap": 1180000000000, "sector": "Technology" },
+    { "symbol": "META", "name": "Meta Platforms Inc.", "market_cap": 885000000000, "sector": "Technology" },
+    { "symbol": "TSLA", "name": "Tesla Inc.", "market_cap": 760000000000, "sector": "Consumer Discretionary" },
+    { "symbol": "JPM", "name": "JPMorgan Chase & Co.", "market_cap": 498000000000, "sector": "Finance" },
+    { "symbol": "V", "name": "Visa Inc.", "market_cap": 512000000000, "sector": "Finance" },
+    { "symbol": "JNJ", "name": "Johnson & Johnson", "market_cap": 387000000000, "sector": "Healthcare" }
+  ],
+  "prices": [
+    { "symbol": "AAPL", "open": 188.50, "high": 190.25, "low": 187.80, "close": 189.95, "volume": 54320000 },
+    { "symbol": "MSFT", "open": 370.00, "high": 376.50, "low": 369.00, "close": 374.58, "volume": 21500000 },
+    { "symbol": "GOOGL", "open": 138.00, "high": 140.50, "low": 137.50, "close": 139.69, "volume": 23400000 },
+    { "symbol": "AMZN", "open": 149.00, "high": 153.00, "low": 148.50, "close": 151.94, "volume": 42100000 },
+    { "symbol": "NVDA", "open": 465.00, "high": 480.00, "low": 463.00, "close": 476.09, "volume": 51200000 },
+    { "symbol": "META", "open": 338.00, "high": 345.00, "low": 336.00, "close": 342.33, "volume": 15600000 },
+    { "symbol": "TSLA", "open": 243.00, "high": 244.50, "low": 236.00, "close": 238.45, "volume": 108000000 },
+    { "symbol": "JPM", "open": 170.00, "high": 173.00, "low": 169.50, "close": 172.15, "volume": 8700000 },
+    { "symbol": "V", "open": 257.00, "high": 259.50, "low": 256.00, "close": 258.74, "volume": 6100000 },
+    { "symbol": "JNJ", "open": 160.50, "high": 161.00, "low": 159.00, "close": 160.23, "volume": 7200000 }
+  ]
+}
