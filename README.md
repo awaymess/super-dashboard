@@ -196,6 +196,12 @@ npm run lint      # Run ESLint
 npm run storybook # Start Storybook
 ```
 
+## 🧪 CI
+
+- Frontend CI workflow: `.github/workflows/frontend-ci.yml`
+- Triggers on pushes/PRs to `main` affecting `frontend/**`
+- Steps: `npm ci`, `npm run lint`, `npm run build`, `npm test` (if present), upload build artifact
+
 ### Backend
 
 ```bash

@@ -17,6 +17,7 @@ export const Default: Story = {
 
 export const Indeterminate: Story = {
   args: {
-    indeterminate: true,
+    value: 50,
+    animated: true,
   },
 };

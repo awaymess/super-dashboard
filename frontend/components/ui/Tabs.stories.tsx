@@ -12,10 +12,11 @@ type Story = StoryObj<typeof Tabs>;
 export const Default: Story = {
   args: {
     tabs: [
-      { key: 'overview', label: 'Overview' },
-      { key: 'stats', label: 'Stats' },
-      { key: 'settings', label: 'Settings' },
+      { id: 'overview', label: 'Overview' },
+      { id: 'stats', label: 'Stats' },
+      { id: 'settings', label: 'Settings' },
     ],
-    value: 'overview',
+    activeTab: 'overview',
+    onChange: () => {},
   },
 };

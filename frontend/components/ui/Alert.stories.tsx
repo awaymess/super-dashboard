@@ -12,7 +12,7 @@ type Story = StoryObj<typeof Alert>;
 export const Info: Story = {
   args: {
     title: 'Information',
-    description: 'This is an info alert.',
+    message: 'This is an info alert.',
     variant: 'info',
   },
 };
@@ -20,7 +20,7 @@ export const Info: Story = {
 export const Success: Story = {
   args: {
     title: 'Success',
-    description: 'Operation completed successfully.',
+    message: 'Operation completed successfully.',
     variant: 'success',
   },
 };
@@ -28,7 +28,7 @@ export const Success: Story = {
 export const Error: Story = {
   args: {
     title: 'Error',
-    description: 'Something went wrong.',
+    message: 'Something went wrong.',
     variant: 'error',
   },
 };
