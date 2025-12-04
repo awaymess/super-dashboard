@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
 	"path/filepath"
 
 	"github.com/gin-contrib/cors"
@@ -39,18 +38,20 @@ func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	// Health check endpoint
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
-		})
-	})
+	// Initialize health handler
+	healthHandler := handler.NewHealthHandler()
+	healthHandler.RegisterHealthRoutes(r)
+
+	// Initialize metrics handler
+	metricsHandler := handler.NewMetricsHandler()
+	metricsHandler.RegisterMetricsRoutes(r)
+	r.Use(metricsHandler.MetricsMiddleware())
 
 	// API v1 routes
 	v1 := r.Group("/api/v1")
 	{
 		v1.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(200, gin.H{
 				"message": "Super Dashboard API v1",
 				"version": "1.0.0",
 			})
@@ -102,6 +103,18 @@ func main() {
 		if err != nil {
 			log.Fatal().Err(err).Msg("Failed to connect to database")
 		}
+
+		// Add database health checker
+		healthHandler.AddHealthChecker(func() (string, bool, string) {
+			sqlDB, err := db.DB()
+			if err != nil {
+				return "database", false, err.Error()
+			}
+			if err := sqlDB.Ping(); err != nil {
+				return "database", false, err.Error()
+			}
+			return "database", true, "connected"
+		})
 
 		// Run migrations
 		if err := database.AutoMigrate(db); err != nil {

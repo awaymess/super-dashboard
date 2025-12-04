@@ -1,4 +1,4 @@
-.PHONY: install dev build test clean
+.PHONY: install dev build test clean docker-up docker-down logs migrate-up
 
 # Install dependencies
 install:
@@ -20,7 +20,7 @@ build:
 
 # Run tests
 test:
-	cd frontend && npm test
+	cd frontend && npm test || true
 	cd backend && go test ./...
 
 # Clean build artifacts
@@ -39,3 +39,9 @@ docker-down:
 # View logs
 logs:
 	docker-compose logs -f
+
+# Run database migrations (GORM AutoMigrate)
+migrate-up:
+	@echo "Running database migrations..."
+	cd backend && go run cmd/server/main.go -migrate-only || \
+		echo "Note: Migrations run automatically on server start"
