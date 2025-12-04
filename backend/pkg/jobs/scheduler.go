@@ -1,4 +1,4 @@
-// Package jobs provides background job scheduling and execution.
+// Package jobs provides background job scheduling and execution using robfig/cron.
 package jobs
 
 import (
@@ -6,43 +6,90 @@ import (
 	"sync"
 	"time"
 
+	"github.com/robfig/cron/v3"
 	"github.com/rs/zerolog/log"
 )
 
-// Job represents a scheduled job.
+// Job represents a scheduled job with cron expression support.
 type Job struct {
 	Name     string
-	Schedule time.Duration
+	CronExpr string // Cron expression (e.g., "*/30 * * * *" for every 30 minutes)
 	Handler  func(ctx context.Context) error
 	running  bool
 	mu       sync.Mutex
 }
 
-// Scheduler manages background jobs.
+// Scheduler manages background jobs using robfig/cron.
 type Scheduler struct {
+	cron    *cron.Cron
 	jobs    []*Job
 	ctx     context.Context
 	cancel  context.CancelFunc
-	wg      sync.WaitGroup
 	running bool
 	mu      sync.Mutex
 }
 
-// NewScheduler creates a new job scheduler.
+// NewScheduler creates a new job scheduler with robfig/cron.
 func NewScheduler() *Scheduler {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &Scheduler{
+		cron:   cron.New(cron.WithSeconds()),
 		jobs:   make([]*Job, 0),
 		ctx:    ctx,
 		cancel: cancel,
 	}
 }
 
-// AddJob adds a job to the scheduler.
-func (s *Scheduler) AddJob(job *Job) {
+// AddJob adds a job to the scheduler with a cron expression.
+func (s *Scheduler) AddJob(job *Job) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	// Create a wrapper function that handles context and concurrency
+	wrappedHandler := s.createJobWrapper(job)
+
+	_, err := s.cron.AddFunc(job.CronExpr, wrappedHandler)
+	if err != nil {
+		return err
+	}
+
 	s.jobs = append(s.jobs, job)
+	return nil
+}
+
+// createJobWrapper creates a wrapper function for the job that handles
+// context cancellation and prevents concurrent execution.
+func (s *Scheduler) createJobWrapper(job *Job) func() {
+	return func() {
+		job.mu.Lock()
+		if job.running {
+			job.mu.Unlock()
+			log.Warn().Str("job", job.Name).Msg("Job already running, skipping")
+			return
+		}
+		job.running = true
+		job.mu.Unlock()
+
+		defer func() {
+			job.mu.Lock()
+			job.running = false
+			job.mu.Unlock()
+		}()
+
+		// Check if scheduler context is cancelled
+		select {
+		case <-s.ctx.Done():
+			return
+		default:
+		}
+
+		start := time.Now()
+		if err := job.Handler(s.ctx); err != nil {
+			log.Error().Err(err).Str("job", job.Name).Msg("Job failed")
+		} else {
+			log.Debug().Str("job", job.Name).Dur("duration", time.Since(start)).Msg("Job completed")
+		}
+	}
 }
 
 // Start starts the scheduler.
@@ -56,11 +103,7 @@ func (s *Scheduler) Start() {
 	s.mu.Unlock()
 
 	log.Info().Int("job_count", len(s.jobs)).Msg("Starting job scheduler")
-
-	for _, job := range s.jobs {
-		s.wg.Add(1)
-		go s.runJob(job)
-	}
+	s.cron.Start()
 }
 
 // Stop stops the scheduler gracefully.
@@ -75,97 +118,77 @@ func (s *Scheduler) Stop() {
 
 	log.Info().Msg("Stopping job scheduler")
 	s.cancel()
-	s.wg.Wait()
+	ctx := s.cron.Stop()
+	<-ctx.Done()
 	log.Info().Msg("Job scheduler stopped")
 }
 
-func (s *Scheduler) runJob(job *Job) {
-	defer s.wg.Done()
-
-	ticker := time.NewTicker(job.Schedule)
-	defer ticker.Stop()
-
-	log.Info().Str("job", job.Name).Dur("schedule", job.Schedule).Msg("Job started")
-
-	// Run immediately on start
-	s.executeJob(job)
-
-	for {
-		select {
-		case <-s.ctx.Done():
-			return
-		case <-ticker.C:
-			s.executeJob(job)
-		}
-	}
+// IsRunning returns whether the scheduler is currently running.
+func (s *Scheduler) IsRunning() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.running
 }
 
-func (s *Scheduler) executeJob(job *Job) {
-	job.mu.Lock()
-	if job.running {
-		job.mu.Unlock()
-		log.Warn().Str("job", job.Name).Msg("Job already running, skipping")
-		return
-	}
-	job.running = true
-	job.mu.Unlock()
+// JobCount returns the number of registered jobs.
+func (s *Scheduler) JobCount() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return len(s.jobs)
+}
 
-	defer func() {
-		job.mu.Lock()
-		job.running = false
-		job.mu.Unlock()
-	}()
-
-	start := time.Now()
-	if err := job.Handler(s.ctx); err != nil {
-		log.Error().Err(err).Str("job", job.Name).Msg("Job failed")
-	} else {
-		log.Debug().Str("job", job.Name).Dur("duration", time.Since(start)).Msg("Job completed")
-	}
+// GetJobs returns a copy of the registered jobs.
+func (s *Scheduler) GetJobs() []*Job {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	jobs := make([]*Job, len(s.jobs))
+	copy(jobs, s.jobs)
+	return jobs
 }
 
 // CreateDefaultJobs creates the default set of background jobs.
 // These are stubs that log their execution - implement actual logic as needed.
+// Uses standard cron expressions with seconds field: sec min hour day month weekday
 func CreateDefaultJobs() []*Job {
 	return []*Job{
 		{
 			Name:     "OddsSync",
-			Schedule: 30 * time.Minute,
+			CronExpr: "0 */30 * * * *", // Every 30 minutes
 			Handler:  oddsSyncHandler,
 		},
 		{
 			Name:     "StockSync",
-			Schedule: 15 * time.Second,
+			CronExpr: "*/15 * * * * *", // Every 15 seconds
 			Handler:  stockSyncHandler,
 		},
 		{
 			Name:     "MatchStatusUpdate",
-			Schedule: 1 * time.Minute,
+			CronExpr: "0 * * * * *", // Every minute
 			Handler:  matchStatusUpdateHandler,
 		},
 		{
 			Name:     "NewsSync",
-			Schedule: 15 * time.Minute,
+			CronExpr: "0 */15 * * * *", // Every 15 minutes
 			Handler:  newsSyncHandler,
 		},
 		{
 			Name:     "SentimentAnalysis",
-			Schedule: 30 * time.Minute,
+			CronExpr: "0 */30 * * * *", // Every 30 minutes
 			Handler:  sentimentAnalysisHandler,
 		},
 		{
 			Name:     "AlertChecker",
-			Schedule: 30 * time.Second,
+			CronExpr: "*/30 * * * * *", // Every 30 seconds
 			Handler:  alertCheckerHandler,
 		},
 		{
 			Name:     "ValueBetCalculator",
-			Schedule: 1 * time.Hour,
+			CronExpr: "0 0 * * * *", // Every hour
 			Handler:  valueBetCalculatorHandler,
 		},
 		{
 			Name:     "AnalyticsAggregation",
-			Schedule: 1 * time.Hour,
+			CronExpr: "0 0 * * * *", // Every hour
 			Handler:  analyticsAggregationHandler,
 		},
 	}
@@ -246,22 +269,23 @@ func analyticsAggregationHandler(ctx context.Context) error {
 	return nil
 }
 
-// DailyJobs returns jobs that should run once per day.
+// CreateDailyJobs returns jobs that should run once per day.
+// Uses standard cron expressions with seconds field.
 func CreateDailyJobs() []*Job {
 	return []*Job{
 		{
 			Name:     "DailyPicks",
-			Schedule: 24 * time.Hour, // Note: Should be triggered at specific time
+			CronExpr: "0 0 6 * * *", // Every day at 6:00 AM
 			Handler:  dailyPicksHandler,
 		},
 		{
 			Name:     "DataCleanup",
-			Schedule: 24 * time.Hour, // Note: Should be triggered at specific time
+			CronExpr: "0 0 2 * * *", // Every day at 2:00 AM
 			Handler:  dataCleanupHandler,
 		},
 		{
 			Name:     "BackupJob",
-			Schedule: 24 * time.Hour, // Note: Should be triggered at specific time
+			CronExpr: "0 0 3 * * *", // Every day at 3:00 AM
 			Handler:  backupJobHandler,
 		},
 	}
