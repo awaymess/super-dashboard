@@ -85,6 +85,16 @@ func main() {
 			log.Info().Msg("Stock endpoints registered with mock data")
 		}
 
+		// Initialize bet handler (mock mode)
+		betHandler := handler.NewBetHandler()
+		betHandler.RegisterBetRoutes(v1)
+		log.Info().Msg("Betting endpoints registered")
+
+		// Initialize paper trading handler (mock mode)
+		paperTradingHandler := handler.NewPaperTradingHandler()
+		paperTradingHandler.RegisterPaperTradingRoutes(v1)
+		log.Info().Msg("Paper trading endpoints registered")
+
 		log.Info().Msg("Running with mock data mode")
 	} else if cfg.DatabaseURL != "" {
 		// Use database repositories

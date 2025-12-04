@@ -13,3 +13,5 @@ export type { EloRating, MatchResult } from './elo';
 export * from './dcf';
 export * from './graham';
 export * from './technicals';
+export * from './valuations';
+
