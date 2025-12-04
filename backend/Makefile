@@ -1,4 +1,4 @@
-.PHONY: build run test clean dev
+.PHONY: build run run-backend test clean dev
 
 # Build the application
 build:
@@ -7,6 +7,9 @@ build:
 # Run the application
 run:
 	go run ./cmd/server
+
+# Alias for run - run the backend server
+run-backend: run
 
 # Run with hot reload (requires air)
 dev:

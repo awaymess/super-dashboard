@@ -27,6 +27,7 @@ import (
 	"github.com/awaymess/super-dashboard/backend/pkg/logger"
 	"github.com/awaymess/super-dashboard/backend/pkg/nlp"
 	"github.com/awaymess/super-dashboard/backend/pkg/redis"
+	"github.com/awaymess/super-dashboard/backend/workers"
 )
 
 func main() {
@@ -69,6 +70,14 @@ func main() {
 			c.JSON(200, gin.H{
 				"message": "Super Dashboard API v1",
 				"version": "1.0.0",
+			})
+		})
+
+		// Ping endpoint for connectivity verification
+		v1.GET("/ping", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message":   "pong",
+				"timestamp": time.Now().UTC().Format(time.RFC3339),
 			})
 		})
 	}
@@ -208,6 +217,17 @@ func main() {
 		log.Warn().Msg("No database URL configured and not in mock mode")
 	}
 
+	// Start background workers
+	// Create a cancellable context for workers
+	workerCtx, workerCancel := context.WithCancel(context.Background())
+	defer workerCancel()
+
+	// Start workers as goroutines
+	go workers.StartOddsSync(workerCtx, log.Logger)
+	go workers.StartStockSync(workerCtx, log.Logger)
+	go workers.StartAlertChecker(workerCtx, log.Logger)
+	log.Info().Msg("Background workers started")
+
 	// Start server with graceful shutdown
 	addr := ":" + cfg.Port
 	srv := &http.Server{
@@ -228,6 +248,9 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Info().Msg("Shutting down server...")
+
+	// Cancel worker context to stop background workers
+	workerCancel()
 
 	// Create a deadline for shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)

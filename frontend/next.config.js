@@ -8,6 +8,8 @@ const nextConfig = {
   images: {
     domains: ['images.unsplash.com', 'via.placeholder.com'],
   },
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
 };
 
 module.exports = withNextIntl(nextConfig);
