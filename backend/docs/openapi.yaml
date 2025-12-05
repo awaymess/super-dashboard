@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Super Dashboard API
+  description: |
+    Integrated Sports Betting Analytics & Stock Monitoring Platform API.
+    
+    This is the backend API for Super Dashboard, providing health checks,
+    authentication, betting, stock monitoring, and paper trading endpoints.
+    
+    ## Health Endpoints
+    - `/health` - Basic health check
+    - `/health/ready` - Readiness check (includes dependency checks)
+    - `/health/live` - Liveness check for Kubernetes probes
+    
+    ## API v1 Endpoints
+    All API endpoints are prefixed with `/api/v1`.
+    
+    ## Authentication
+    Most endpoints require JWT Bearer token authentication.
+    Use `/api/v1/auth/login` to obtain tokens.
+  version: 1.0.0
+  contact:
+    name: Super Dashboard Team
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://api.superdashboard.io
+    description: Production server
+
+tags:
+  - name: health
+    description: Health check endpoints
+  - name: api
+    description: General API endpoints
+
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Basic health check
+      description: Returns basic health status of the service. Always returns 200 if the service is running.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: ok
+
+  /health/ready:
+    get:
+      tags: [health]
+      summary: Readiness check
+      description: |
+        Checks if the service is ready to accept traffic.
+        Includes dependency checks for database and Redis when not in mock mode.
+        Returns 503 if any dependency is unhealthy.
+      operationId: getHealthReady
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthReadyResponse'
+              example:
+                status: ready
+                details:
+                  database:
+                    status: up
+                    message: connected
+                  redis:
+                    status: up
+                    message: connected
+        '503':
+          description: Service not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthReadyResponse'
+              example:
+                status: not_ready
+                details:
+                  database:
+                    status: down
+                    message: connection refused
+
+  /health/live:
+    get:
+      tags: [health]
+      summary: Liveness check
+      description: |
+        Checks if the service is alive. Used by Kubernetes liveness probes.
+        Always returns 200 if the service process is running.
+      operationId: getHealthLive
+      responses:
+        '200':
+          description: Service is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: alive
+
+  /api/v1/ping:
+    get:
+      tags: [api]
+      summary: Ping endpoint
+      description: Simple ping endpoint to verify API connectivity.
+      operationId: ping
+      responses:
+        '200':
+          description: Pong response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PingResponse'
+              example:
+                message: pong
+                timestamp: "2024-01-15T12:00:00Z"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Health status
+          example: ok
+
+    HealthReadyResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: Readiness status
+          enum: [ready, not_ready]
+          example: ready
+        details:
+          type: object
+          description: Dependency status details
+          additionalProperties:
+            $ref: '#/components/schemas/DependencyStatus'
+
+    DependencyStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [up, down]
+          example: up
+        message:
+          type: string
+          example: connected
+
+    PingResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: pong
+        timestamp:
+          type: string
+          format: date-time
+          description: Server timestamp
+          example: "2024-01-15T12:00:00Z"
