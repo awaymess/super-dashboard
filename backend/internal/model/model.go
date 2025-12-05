@@ -242,3 +242,258 @@ type Trade struct {
 	Total       float64   `json:"total" gorm:"not null"`
 	ExecutedAt  time.Time `json:"executed_at"`
 }
+
+// AlertType represents the type of alert.
+type AlertType string
+
+const (
+	AlertTypeStockPrice   AlertType = "stock_price"
+	AlertTypeStockVolume  AlertType = "stock_volume"
+	AlertTypeOddsChange   AlertType = "odds_change"
+	AlertTypeMatchStart   AlertType = "match_start"
+	AlertTypeValueBet     AlertType = "value_bet"
+	AlertTypeTechnical    AlertType = "technical"
+	AlertTypeNews         AlertType = "news"
+	AlertTypeDividend     AlertType = "dividend"
+	AlertTypeEarnings     AlertType = "earnings"
+)
+
+// AlertCondition represents the condition for triggering an alert.
+type AlertCondition string
+
+const (
+	AlertConditionAbove       AlertCondition = "above"
+	AlertConditionBelow       AlertCondition = "below"
+	AlertConditionEquals      AlertCondition = "equals"
+	AlertConditionPercentUp   AlertCondition = "percent_up"
+	AlertConditionPercentDown AlertCondition = "percent_down"
+	AlertConditionCrosses     AlertCondition = "crosses"
+)
+
+// Alert represents a user-configured alert.
+type Alert struct {
+	ID             uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID         uuid.UUID       `json:"user_id" gorm:"type:uuid;index;not null"`
+	User           User            `json:"-" gorm:"foreignKey:UserID"`
+	Type           AlertType       `json:"type" gorm:"type:varchar(50);not null"`
+	Symbol         string          `json:"symbol" gorm:"index"` // Stock symbol or match identifier
+	Condition      AlertCondition  `json:"condition" gorm:"type:varchar(50);not null"`
+	TargetValue    float64         `json:"target_value"`
+	CurrentValue   float64         `json:"current_value"`
+	Message        string          `json:"message"`
+	Active         bool            `json:"active" gorm:"default:true"`
+	LastTriggered  *time.Time      `json:"last_triggered,omitempty"`
+	TriggerCount   int             `json:"trigger_count" gorm:"default:0"`
+	NotifyEmail    bool            `json:"notify_email" gorm:"default:false"`
+	NotifyTelegram bool            `json:"notify_telegram" gorm:"default:false"`
+	NotifyLINE     bool            `json:"notify_line" gorm:"default:false"`
+	NotifyDiscord  bool            `json:"notify_discord" gorm:"default:false"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+}
+
+// NotificationType represents the type of notification.
+type NotificationType string
+
+const (
+	NotificationTypeAlert      NotificationType = "alert"
+	NotificationTypeValueBet   NotificationType = "value_bet"
+	NotificationTypeMatchStart NotificationType = "match_start"
+	NotificationTypeTrade      NotificationType = "trade"
+	NotificationTypeSystem     NotificationType = "system"
+)
+
+// NotificationStatus represents the status of a notification.
+type NotificationStatus string
+
+const (
+	NotificationStatusUnread NotificationStatus = "unread"
+	NotificationStatusRead   NotificationStatus = "read"
+	NotificationStatusSent   NotificationStatus = "sent"
+	NotificationStatusFailed NotificationStatus = "failed"
+)
+
+// Notification represents a notification to be sent to a user.
+type Notification struct {
+	ID        uuid.UUID          `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID    uuid.UUID          `json:"user_id" gorm:"type:uuid;index;not null"`
+	User      User               `json:"-" gorm:"foreignKey:UserID"`
+	Type      NotificationType   `json:"type" gorm:"type:varchar(50);not null"`
+	Title     string             `json:"title" gorm:"not null"`
+	Message   string             `json:"message" gorm:"not null"`
+	Data      string             `json:"data"` // JSON string for additional data
+	Status    NotificationStatus `json:"status" gorm:"type:varchar(20);default:'unread'"`
+	ReadAt    *time.Time         `json:"read_at,omitempty"`
+	CreatedAt time.Time          `json:"created_at" gorm:"index"`
+}
+
+// Watchlist represents a user's stock watchlist.
+type Watchlist struct {
+	ID          uuid.UUID       `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID      uuid.UUID       `json:"user_id" gorm:"type:uuid;index;not null"`
+	User        User            `json:"-" gorm:"foreignKey:UserID"`
+	Name        string          `json:"name" gorm:"not null"`
+	Description string          `json:"description"`
+	Items       []WatchlistItem `json:"items,omitempty" gorm:"foreignKey:WatchlistID"`
+	CreatedAt   time.Time       `json:"created_at"`
+	UpdatedAt   time.Time       `json:"updated_at"`
+}
+
+// WatchlistItem represents a stock in a watchlist.
+type WatchlistItem struct {
+	ID          uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	WatchlistID uuid.UUID `json:"watchlist_id" gorm:"type:uuid;index;not null"`
+	Watchlist   Watchlist `json:"-" gorm:"foreignKey:WatchlistID"`
+	StockID     uuid.UUID `json:"stock_id" gorm:"type:uuid;index;not null"`
+	Stock       Stock     `json:"stock" gorm:"foreignKey:StockID"`
+	Notes       string    `json:"notes"`
+	AddedAt     time.Time `json:"added_at"`
+}
+
+// Bet represents a sports bet placed by a user.
+type Bet struct {
+	ID              uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID          uuid.UUID  `json:"user_id" gorm:"type:uuid;index;not null"`
+	User            User       `json:"-" gorm:"foreignKey:UserID"`
+	MatchID         uuid.UUID  `json:"match_id" gorm:"type:uuid;index;not null"`
+	Match           Match      `json:"match" gorm:"foreignKey:MatchID"`
+	Market          string     `json:"market" gorm:"not null"`
+	Selection       string     `json:"selection" gorm:"not null"`
+	Odds            float64    `json:"odds" gorm:"not null"`
+	Stake           float64    `json:"stake" gorm:"not null"`
+	PotentialReturn float64    `json:"potential_return" gorm:"not null"`
+	Bookmaker       string     `json:"bookmaker"`
+	Status          string     `json:"status" gorm:"default:'pending'"`
+	Result          string     `json:"result"`
+	Profit          float64    `json:"profit"`
+	ClosingOdds     float64    `json:"closing_odds"`
+	ValuePercent    float64    `json:"value_percent"`
+	SettledAt       *time.Time `json:"settled_at,omitempty"`
+	CreatedAt       time.Time  `json:"created_at"`
+	UpdatedAt       time.Time  `json:"updated_at"`
+}
+
+// BankrollHistory represents a snapshot of user's bankroll over time.
+type BankrollHistory struct {
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID    uuid.UUID `json:"user_id" gorm:"type:uuid;index;not null"`
+	User      User      `json:"-" gorm:"foreignKey:UserID"`
+	Balance   float64   `json:"balance" gorm:"not null"`
+	Change    float64   `json:"change"`
+	Reason    string    `json:"reason"`
+	CreatedAt time.Time `json:"created_at" gorm:"index"`
+}
+
+// ValueBet represents a detected value betting opportunity.
+type ValueBet struct {
+	ID                uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	MatchID           uuid.UUID  `json:"match_id" gorm:"type:uuid;index;not null"`
+	Match             Match      `json:"match" gorm:"foreignKey:MatchID"`
+	Market            string     `json:"market" gorm:"not null"`
+	Selection         string     `json:"selection" gorm:"not null"`
+	Bookmaker         string     `json:"bookmaker" gorm:"not null"`
+	BookmakerOdds     float64    `json:"bookmaker_odds" gorm:"not null"`
+	TrueProbability   float64    `json:"true_probability" gorm:"not null"`
+	ImpliedProbability float64   `json:"implied_probability" gorm:"not null"`
+	ValuePercent      float64    `json:"value_percent" gorm:"not null"`
+	KellyStake        float64    `json:"kelly_stake"`
+	Confidence        float64    `json:"confidence"`
+	ExpiresAt         time.Time  `json:"expires_at"`
+	NotifiedUsers     []uuid.UUID `json:"-" gorm:"-"` // Runtime field
+	CreatedAt         time.Time  `json:"created_at" gorm:"index"`
+}
+
+// StockNews represents a news article about a stock.
+type StockNews struct {
+	ID          uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	StockID     *uuid.UUID `json:"stock_id,omitempty" gorm:"type:uuid;index"`
+	Stock       *Stock     `json:"stock,omitempty" gorm:"foreignKey:StockID"`
+	Title       string     `json:"title" gorm:"not null"`
+	Content     string     `json:"content" gorm:"type:text"`
+	Source      string     `json:"source"`
+	URL         string     `json:"url"`
+	Sentiment   float64    `json:"sentiment"` // -1 to 1
+	PublishedAt time.Time  `json:"published_at" gorm:"index"`
+	CreatedAt   time.Time  `json:"created_at"`
+}
+
+// FairValue represents a calculated fair value for a stock.
+type FairValue struct {
+	ID               uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	StockID          uuid.UUID `json:"stock_id" gorm:"type:uuid;index;not null"`
+	Stock            Stock     `json:"stock" gorm:"foreignKey:StockID"`
+	DCFValue         float64   `json:"dcf_value"`
+	PEValue          float64   `json:"pe_value"`
+	PBVValue         float64   `json:"pbv_value"`
+	GrahamValue      float64   `json:"graham_value"`
+	BuffettValue     float64   `json:"buffett_value"`
+	WeightedAvg      float64   `json:"weighted_avg" gorm:"not null"`
+	CurrentPrice     float64   `json:"current_price" gorm:"not null"`
+	MarginOfSafety   float64   `json:"margin_of_safety"`
+	UpsidePercent    float64   `json:"upside_percent"`
+	Recommendation   string    `json:"recommendation"`
+	CalculatedAt     time.Time `json:"calculated_at" gorm:"index"`
+}
+
+// TradeJournal represents a trading journal entry.
+type TradeJournal struct {
+	ID             uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID         uuid.UUID  `json:"user_id" gorm:"type:uuid;index;not null"`
+	User           User       `json:"-" gorm:"foreignKey:UserID"`
+	TradeID        *uuid.UUID `json:"trade_id,omitempty" gorm:"type:uuid;index"`
+	Trade          *Trade     `json:"trade,omitempty" gorm:"foreignKey:TradeID"`
+	BetID          *uuid.UUID `json:"bet_id,omitempty" gorm:"type:uuid;index"`
+	Bet            *Bet       `json:"bet,omitempty" gorm:"foreignKey:BetID"`
+	EntryReason    string     `json:"entry_reason" gorm:"type:text"`
+	ExitReason     string     `json:"exit_reason" gorm:"type:text"`
+	Emotions       string     `json:"emotions"`
+	LessonsLearned string     `json:"lessons_learned" gorm:"type:text"`
+	Rating         int        `json:"rating"` // 1-5
+	Tags           string     `json:"tags"`   // Comma-separated tags
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+}
+
+// Goal represents a user's financial goal.
+type Goal struct {
+	ID             uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID         uuid.UUID  `json:"user_id" gorm:"type:uuid;index;not null"`
+	User           User       `json:"-" gorm:"foreignKey:UserID"`
+	Title          string     `json:"title" gorm:"not null"`
+	Description    string     `json:"description"`
+	TargetAmount   float64    `json:"target_amount" gorm:"not null"`
+	CurrentAmount  float64    `json:"current_amount" gorm:"default:0"`
+	TargetDate     *time.Time `json:"target_date,omitempty"`
+	Category       string     `json:"category"` // betting, trading, portfolio
+	Status         string     `json:"status" gorm:"default:'active'"`
+	AchievedAt     *time.Time `json:"achieved_at,omitempty"`
+	CreatedAt      time.Time  `json:"created_at"`
+	UpdatedAt      time.Time  `json:"updated_at"`
+}
+
+// Settings represents user preferences and settings.
+type Settings struct {
+	ID                    uuid.UUID `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID                uuid.UUID `json:"user_id" gorm:"type:uuid;uniqueIndex;not null"`
+	User                  User      `json:"-" gorm:"foreignKey:UserID"`
+	InitialBankroll       float64   `json:"initial_bankroll" gorm:"default:1000"`
+	CurrentBankroll       float64   `json:"current_bankroll" gorm:"default:1000"`
+	KellyFactor           float64   `json:"kelly_factor" gorm:"default:0.5"`
+	RiskLevel             string    `json:"risk_level" gorm:"default:'moderate'"`
+	DefaultBookmaker      string    `json:"default_bookmaker"`
+	ValueBetThreshold     float64   `json:"value_bet_threshold" gorm:"default:5"`
+	MaxDailyBets          int       `json:"max_daily_bets" gorm:"default:10"`
+	MaxStakePerBet        float64   `json:"max_stake_per_bet"`
+	PreferredLeagues      string    `json:"preferred_leagues"` // JSON array
+	NotifyEmail           bool      `json:"notify_email" gorm:"default:true"`
+	NotifyTelegram        bool      `json:"notify_telegram" gorm:"default:false"`
+	NotifyLINE            bool      `json:"notify_line" gorm:"default:false"`
+	NotifyDiscord         bool      `json:"notify_discord" gorm:"default:false"`
+	TelegramChatID        string    `json:"telegram_chat_id"`
+	LINEToken             string    `json:"line_token"`
+	DiscordWebhook        string    `json:"discord_webhook"`
+	Theme                 string    `json:"theme" gorm:"default:'dark'"`
+	Language              string    `json:"language" gorm:"default:'en'"`
+	CreatedAt             time.Time `json:"created_at"`
+	UpdatedAt             time.Time `json:"updated_at"`
+}
