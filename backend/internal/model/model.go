@@ -13,8 +13,93 @@ type User struct {
 	PasswordHash string    `json:"-" gorm:"not null"`
 	Name         string    `json:"name"`
 	Role         string    `json:"role" gorm:"default:'user'"`
+	TwoFAEnabled bool      `json:"two_fa_enabled" gorm:"default:false"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// Session represents a user session.
+type Session struct {
+	ID           uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID       uuid.UUID  `json:"user_id" gorm:"type:uuid;index;not null"`
+	User         User       `json:"-" gorm:"foreignKey:UserID"`
+	RefreshToken string     `json:"-" gorm:"uniqueIndex;not null"`
+	UserAgent    string     `json:"user_agent"`
+	IPAddress    string     `json:"ip_address"`
+	ExpiresAt    time.Time  `json:"expires_at"`
+	RevokedAt    *time.Time `json:"revoked_at,omitempty"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+}
+
+// OAuthProvider represents supported OAuth providers.
+type OAuthProvider string
+
+const (
+	OAuthProviderGoogle OAuthProvider = "google"
+	OAuthProviderGitHub OAuthProvider = "github"
+)
+
+// OAuthAccount represents an OAuth account linked to a user.
+type OAuthAccount struct {
+	ID             uuid.UUID     `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID         uuid.UUID     `json:"user_id" gorm:"type:uuid;index;not null"`
+	User           User          `json:"-" gorm:"foreignKey:UserID"`
+	Provider       OAuthProvider `json:"provider" gorm:"type:varchar(20);not null"`
+	ProviderUserID string        `json:"provider_user_id" gorm:"not null"`
+	Email          string        `json:"email"`
+	Name           string        `json:"name"`
+	AvatarURL      string        `json:"avatar_url"`
+	AccessToken    string        `json:"-"`
+	RefreshToken   string        `json:"-"`
+	ExpiresAt      *time.Time    `json:"expires_at,omitempty"`
+	CreatedAt      time.Time     `json:"created_at"`
+	UpdatedAt      time.Time     `json:"updated_at"`
+}
+
+// TwoFactorAuth represents 2FA TOTP configuration for a user.
+type TwoFactorAuth struct {
+	ID          uuid.UUID  `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID      uuid.UUID  `json:"user_id" gorm:"type:uuid;uniqueIndex;not null"`
+	User        User       `json:"-" gorm:"foreignKey:UserID"`
+	Secret      string     `json:"-" gorm:"not null"`
+	BackupCodes string     `json:"-"` // JSON array of backup codes
+	Verified    bool       `json:"verified" gorm:"default:false"`
+	EnabledAt   *time.Time `json:"enabled_at,omitempty"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+}
+
+// AuditAction represents types of audit actions.
+type AuditAction string
+
+const (
+	AuditActionLogin            AuditAction = "login"
+	AuditActionLogout           AuditAction = "logout"
+	AuditActionRegister         AuditAction = "register"
+	AuditActionPasswordChange   AuditAction = "password_change"
+	AuditAction2FAEnable        AuditAction = "2fa_enable"
+	AuditAction2FADisable       AuditAction = "2fa_disable"
+	AuditActionSettingsChange   AuditAction = "settings_change"
+	AuditActionOAuthLink        AuditAction = "oauth_link"
+	AuditActionOAuthUnlink      AuditAction = "oauth_unlink"
+	AuditActionTokenRefresh     AuditAction = "token_refresh"
+	AuditActionSessionRevoke    AuditAction = "session_revoke"
+	AuditActionFailedLogin      AuditAction = "failed_login"
+	AuditActionFailed2FAAttempt AuditAction = "failed_2fa_attempt"
+)
+
+// AuditLog represents an audit log entry for security events.
+type AuditLog struct {
+	ID        uuid.UUID   `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	UserID    *uuid.UUID  `json:"user_id,omitempty" gorm:"type:uuid;index"`
+	User      *User       `json:"-" gorm:"foreignKey:UserID"`
+	Action    AuditAction `json:"action" gorm:"type:varchar(50);index;not null"`
+	IPAddress string      `json:"ip_address"`
+	UserAgent string      `json:"user_agent"`
+	Details   string      `json:"details"` // JSON string for additional details
+	Success   bool        `json:"success" gorm:"default:true"`
+	CreatedAt time.Time   `json:"created_at" gorm:"index"`
 }
 
 // Team represents a sports team.
