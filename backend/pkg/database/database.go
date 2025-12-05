@@ -26,12 +26,20 @@ func AutoMigrate(db *gorm.DB) error {
 	log.Info().Msg("Running database migrations...")
 
 	err := db.AutoMigrate(
+		// Auth & Users
 		&model.User{},
+		&model.Session{},
+		&model.OAuthAccount{},
+		&model.TwoFactorAuth{},
+		&model.AuditLog{},
+		// Sports
 		&model.Team{},
 		&model.Match{},
 		&model.Odds{},
+		// Stocks
 		&model.Stock{},
 		&model.StockPrice{},
+		// Paper Trading
 		&model.Portfolio{},
 		&model.Position{},
 		&model.Order{},

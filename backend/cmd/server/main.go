@@ -6,6 +6,9 @@ package main
 // @schemes http
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 
 import (
 	"context"
@@ -18,9 +21,12 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	goredis "github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
+
 	"github.com/awaymess/super-dashboard/backend/internal/config"
 	"github.com/awaymess/super-dashboard/backend/internal/handler"
+	"github.com/awaymess/super-dashboard/backend/internal/middleware"
 	"github.com/awaymess/super-dashboard/backend/internal/repository"
 	"github.com/awaymess/super-dashboard/backend/internal/service"
 	"github.com/awaymess/super-dashboard/backend/pkg/database"
@@ -53,6 +59,15 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.Default())
+
+	// Add security headers middleware
+	var securityConfig middleware.SecurityHeadersConfig
+	if cfg.Env == "production" {
+		securityConfig = middleware.ProductionSecurityHeadersConfig()
+	} else {
+		securityConfig = middleware.DefaultSecurityHeadersConfig()
+	}
+	r.Use(middleware.SecurityHeadersMiddleware(securityConfig))
 
 	// Initialize health handler
 	healthHandler := handler.NewHealthHandler()
@@ -174,45 +189,77 @@ func main() {
 
 		// Initialize repositories
 		userRepo := repository.NewUserRepository(db)
+		sessionRepo := repository.NewSessionRepository(db)
+		oauthRepo := repository.NewOAuthAccountRepository(db)
+		twoFARepo := repository.NewTwoFactorAuthRepository(db)
+		auditLogRepo := repository.NewAuditLogRepository(db)
 		portfolioRepo := repository.NewPortfolioRepository(db)
 		positionRepo := repository.NewPositionRepository(db)
 		orderRepo := repository.NewOrderRepository(db)
 		tradeRepo := repository.NewTradeRepository(db)
 
-		// Initialize Redis for token storage (optional)
+		// Initialize Redis for token storage and rate limiting
 		var tokenStore service.TokenStore
+		var redisClient *goredis.Client
 		if cfg.RedisURL != "" {
-			redisClient, err := redis.Connect(cfg.RedisURL)
+			redisWrapper, err := redis.Connect(cfg.RedisURL)
 			if err != nil {
-				log.Warn().Err(err).Msg("Failed to connect to Redis, continuing without token persistence")
+				log.Warn().Err(err).Msg("Failed to connect to Redis, continuing without token persistence and distributed rate limiting")
 			} else {
-				tokenStore = redisClient
+				tokenStore = redisWrapper
+				// Parse Redis URL to get underlying client for rate limiting
+				opts, _ := goredis.ParseURL(cfg.RedisURL)
+				if opts != nil {
+					redisClient = goredis.NewClient(opts)
+				}
 				// Add Redis health checker with timeout
 				healthHandler.AddHealthChecker(func() (string, bool, string) {
 					ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 					defer cancel()
-					if err := redisClient.Ping(ctx); err != nil {
+					if err := redisWrapper.Ping(ctx); err != nil {
 						return "redis", false, err.Error()
 					}
 					return "redis", true, "connected"
 				})
-				log.Info().Msg("Connected to Redis for token storage")
+				log.Info().Msg("Connected to Redis for token storage and rate limiting")
 			}
 		}
 
-		// Initialize services
-		authService := service.NewAuthService(userRepo, cfg.JWTSecret, tokenStore)
+		// Initialize extended auth service with full functionality
+		authService := service.NewExtendedAuthService(service.AuthServiceConfig{
+			UserRepo:     userRepo,
+			SessionRepo:  sessionRepo,
+			OAuthRepo:    oauthRepo,
+			TwoFARepo:    twoFARepo,
+			AuditLogRepo: auditLogRepo,
+			TokenStore:   tokenStore,
+			JWTSecret:    cfg.JWTSecret,
+			IssuerName:   "SuperDashboard",
+		})
 		paperService := service.NewPaperTradingService(portfolioRepo, positionRepo, orderRepo, tradeRepo, nil)
 
+		// Create auth middleware
+		authMiddleware := middleware.AuthMiddleware(authService)
+
 		// Initialize handlers
-		authHandler := handler.NewAuthHandler(authService)
+		authHandler := handler.NewExtendedAuthHandler(authService)
 		paperHandler := handler.NewPaperHandler(paperService)
 
-		// Register routes
-		authHandler.RegisterAuthRoutes(v1)
+		// Apply rate limiting to auth routes
+		authRateLimiter := middleware.AuthRateLimitMiddleware(redisClient)
+		apiRateLimiter := middleware.APIRateLimitMiddleware(redisClient)
+
+		// Register auth routes with rate limiting
+		authGroup := v1.Group("/auth")
+		authGroup.Use(authRateLimiter)
+		authHandler.RegisterExtendedAuthRoutes(v1, authMiddleware)
+		
+		// Register paper routes with API rate limiting
+		paperGroup := v1.Group("/paper")
+		paperGroup.Use(apiRateLimiter)
 		paperHandler.RegisterPaperRoutes(v1)
 
-		log.Info().Msg("Database-backed services initialized")
+		log.Info().Msg("Database-backed services initialized with extended auth")
 	} else {
 		log.Warn().Msg("No database URL configured and not in mock mode")
 	}
