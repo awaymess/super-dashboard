@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -152,7 +154,7 @@ func buildCSP(config SecurityHeadersConfig) string {
 
 // buildHSTS builds the Strict-Transport-Security header value.
 func buildHSTS(config SecurityHeadersConfig) string {
-	hsts := "max-age=" + itoa(config.HSTSMaxAge)
+	hsts := "max-age=" + strconv.Itoa(config.HSTSMaxAge)
 	if config.HSTSIncludeSubdomains {
 		hsts += "; includeSubDomains"
 	}
@@ -160,31 +162,4 @@ func buildHSTS(config SecurityHeadersConfig) string {
 		hsts += "; preload"
 	}
 	return hsts
-}
-
-// itoa converts int to string without importing strconv
-func itoa(i int) string {
-	if i == 0 {
-		return "0"
-	}
-
-	var b [20]byte
-	pos := len(b)
-	negative := i < 0
-	if negative {
-		i = -i
-	}
-
-	for i > 0 {
-		pos--
-		b[pos] = byte('0' + i%10)
-		i /= 10
-	}
-
-	if negative {
-		pos--
-		b[pos] = '-'
-	}
-
-	return string(b[pos:])
 }

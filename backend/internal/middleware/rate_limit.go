@@ -21,6 +21,7 @@ type RateLimitConfig struct {
 // RateLimiter provides rate limiting functionality.
 type RateLimiter interface {
 	Allow(ctx context.Context, key string) (bool, int, time.Duration, error)
+	Limit() int
 }
 
 // redisRateLimiter implements rate limiting using Redis.
@@ -67,6 +68,11 @@ func (r *redisRateLimiter) Allow(ctx context.Context, key string) (bool, int, ti
 	allowed := count <= int64(r.requests)
 
 	return allowed, remaining, ttl, nil
+}
+
+// Limit returns the configured request limit.
+func (r *redisRateLimiter) Limit() int {
+	return r.requests
 }
 
 // inMemoryRateLimiter implements rate limiting using in-memory storage.
@@ -116,6 +122,11 @@ func (r *inMemoryRateLimiter) Allow(_ context.Context, key string) (bool, int, t
 	return allowed, remaining, ttl, nil
 }
 
+// Limit returns the configured request limit.
+func (r *inMemoryRateLimiter) Limit() int {
+	return r.requests
+}
+
 // RateLimitMiddleware creates a rate limiting middleware.
 func RateLimitMiddleware(limiter RateLimiter, keyPrefix string) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -134,7 +145,7 @@ func RateLimitMiddleware(limiter RateLimiter, keyPrefix string) gin.HandlerFunc 
 		}
 
 		// Set rate limit headers
-		c.Header("X-RateLimit-Limit", strconv.Itoa(remaining+1))
+		c.Header("X-RateLimit-Limit", strconv.Itoa(limiter.Limit()))
 		c.Header("X-RateLimit-Remaining", strconv.Itoa(remaining))
 		c.Header("X-RateLimit-Reset", strconv.FormatInt(time.Now().Add(ttl).Unix(), 10))
 

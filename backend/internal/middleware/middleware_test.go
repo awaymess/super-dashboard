@@ -359,6 +359,9 @@ func TestRateLimitMiddleware(t *testing.T) {
 	if w.Header().Get("X-RateLimit-Remaining") != "0" {
 		t.Errorf("Expected X-RateLimit-Remaining to be 0")
 	}
+	if w.Header().Get("X-RateLimit-Limit") != "2" {
+		t.Errorf("Expected X-RateLimit-Limit to be 2, got %s", w.Header().Get("X-RateLimit-Limit"))
+	}
 }
 
 func TestSecurityHeadersMiddleware(t *testing.T) {
